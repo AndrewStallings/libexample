@@ -1,12 +1,36 @@
 import { describe, expect, it } from "vitest";
-import { createCrudTestHarness } from "our-lib";
-import { InMemoryBookRepository } from "@/features/books/bookRepository";
+import { InMemoryAuditLogger, createInMemoryCrudRepository } from "our-lib";
 import { createBookService } from "@/features/books/bookService";
+import { initialBooks } from "@/features/books/bookRepository";
+import type { BookInput, BookRecord } from "@/features/books/bookSchemas";
+
+const createBookRepository = () => {
+  return createInMemoryCrudRepository<BookRecord, BookInput, BookInput>({
+    initialItems: initialBooks,
+    getId: (record) => record.bookId,
+    createRecord: (input, currentItems) => {
+      return {
+        bookId: `BK-${1000 + currentItems.length + 1}`,
+        ...input,
+        updatedAt: new Date().toISOString(),
+        updatedBy: input.ownerName,
+      };
+    },
+    updateRecord: (existing, input) => {
+      return {
+        ...existing,
+        ...input,
+        updatedAt: new Date().toISOString(),
+        updatedBy: input.ownerName,
+      };
+    },
+  });
+};
 
 describe("createBookService", () => {
   it("creates a book and writes an audit log without touching a database", async () => {
-    const repository = new InMemoryBookRepository();
-    const { logger } = createCrudTestHarness();
+    const repository = createBookRepository();
+    const logger = new InMemoryAuditLogger();
     const service = createBookService(repository, logger);
 
     const created = await service.create(
@@ -27,8 +51,8 @@ describe("createBookService", () => {
   });
 
   it("rejects invalid archived notes through zod validation", async () => {
-    const repository = new InMemoryBookRepository();
-    const { logger } = createCrudTestHarness();
+    const repository = createBookRepository();
+    const logger = new InMemoryAuditLogger();
     const service = createBookService(repository, logger);
 
     await expect(

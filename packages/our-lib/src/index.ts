@@ -7,4 +7,4 @@ export * from "./dal/drizzle/schema/auditLog";
 export * from "./ui/EntityCard";
 export * from "./ui/FormFrame";
 export * from "./ui/Input";
-export * from "./testing/createCrudTestHarness";
+export * from "./testing/createInMemoryCrudRepository";
