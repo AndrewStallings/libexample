@@ -5,6 +5,20 @@ export type ListResult<TRecord> = {
   total: number;
 };
 
+export interface ResourceQueryService<TRecord> {
+  list(): Promise<ListResult<TRecord>>;
+  getById(id: EntityId): Promise<TRecord | null>;
+}
+
+export interface ResourceMutationService<TRecord, TCreateInput, TUpdateInput = TCreateInput> {
+  create(input: TCreateInput, userId: string): Promise<TRecord>;
+  update(id: EntityId, input: TUpdateInput, userId: string): Promise<TRecord>;
+}
+
+export interface ResourceService<TRecord, TCreateInput, TUpdateInput = TCreateInput>
+  extends ResourceQueryService<TRecord>,
+    ResourceMutationService<TRecord, TCreateInput, TUpdateInput> {}
+
 export interface RecordRepository<TRecord, TCreateInput, TUpdateInput> {
   list(): Promise<ListResult<TRecord>>;
   getById(id: EntityId): Promise<TRecord | null>;

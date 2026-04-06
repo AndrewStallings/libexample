@@ -24,5 +24,17 @@ describe("BooksLibraryPage", () => {
     expect(screen.getAllByRole("link", { name: "Open Pages" })).toHaveLength(2);
     expect(screen.getAllByRole("button", { name: "Open History" })).toHaveLength(2);
   });
+
+  it("renders the create book call to action", () => {
+    render(<BooksLibraryPage />);
+
+    expect(screen.getByRole("link", { name: "Create Book" })).toHaveAttribute("href", "/books/new");
+  });
+
+  it("shows request review only for non-published books", () => {
+    render(<BooksLibraryPage />);
+
+    expect(screen.getAllByRole("button", { name: "Request Review" })).toHaveLength(1);
+  });
 });
 
