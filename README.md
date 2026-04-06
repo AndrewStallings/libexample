@@ -22,15 +22,27 @@ The important part is not testing this demo app by itself. The intended pattern 
 - test services with in-memory repositories or mocked repositories
 - test React screens with `@testing-library/react`
 - avoid any database dependency in unit tests
-- optionally share lightweight helpers such as `src/testing/createCrudTestHarness.ts`
+- optionally share lightweight helpers such as fixtures and small form interaction helpers
 
 ## Suggested library test layout
 
 - `src/features/<feature>/__tests__`: feature-level tests for services, schemas, and form behavior
-- `src/lib/**/__tests__`: shared library component and helper tests
+- `packages/our-lib/src/**/__tests__`: shared library component and helper tests
 - `src/testing`: shared harnesses, mocks, and fixtures that both this library and consuming apps can mirror
 
 This structure scales better once multiple CRUD resources and multiple form features already exist, because it separates shared-library tests from app-page concerns without forcing everything into one global test folder.
+
+## Package entry points
+
+The library can be consumed either from the root entry point or from narrower subpaths:
+
+- `our-lib`
+- `our-lib/cards`
+- `our-lib/forms`
+- `our-lib/dal`
+- `our-lib/testing`
+
+The narrower entry points are useful when you want the package structure to stay obvious to consumers as the library grows.
 
 ## Why these dependencies
 

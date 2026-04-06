@@ -1,11 +1,11 @@
-import type { EntityId } from "../types";
+import type { EntityId } from "../types/index";
 
 export type ListResult<TRecord> = {
   items: TRecord[];
   total: number;
 };
 
-export interface CrudRepository<TRecord, TCreateInput, TUpdateInput> {
+export interface RecordRepository<TRecord, TCreateInput, TUpdateInput> {
   list(): Promise<ListResult<TRecord>>;
   getById(id: EntityId): Promise<TRecord | null>;
   create(input: TCreateInput): Promise<TRecord>;

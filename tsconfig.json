@@ -27,8 +27,23 @@
       "our-lib": [
         "./packages/our-lib/src/index.ts"
       ],
-      "@/*": [
-        "./src/*"
+      "@/books/*": [
+        "./src/app/books/*"
+      ],
+      "@/book-pages/*": [
+        "./src/app/book-pages/*"
+      ],
+      "@/reviews/*": [
+        "./src/app/reviews/*"
+      ],
+      "@/sales/*": [
+        "./src/app/sales/*"
+      ],
+      "@/drop-box-locations/*": [
+        "./src/app/drop-box-locations/*"
+      ],
+      "@/testing/*": [
+        "./src/testing/*"
       ]
     }
   },

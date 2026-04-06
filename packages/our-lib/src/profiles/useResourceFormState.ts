@@ -1,0 +1,66 @@
+"use client";
+
+import { useState } from "react";
+
+type ResourceFormMode = "create" | "edit";
+
+type UseResourceFormStateOptions<TRecord, TInput> = {
+  mode: ResourceFormMode;
+  initialRecord?: TRecord;
+  createRecord: (input: TInput) => Promise<TRecord>;
+  updateRecord: (record: TRecord, input: TInput) => Promise<TRecord>;
+  getRecordId: (record: TRecord) => string;
+  entityLabel?: string;
+  getCreatedMessage?: (record: TRecord) => string;
+  getUpdatedMessage?: (record: TRecord) => string;
+  getMissingRecordMessage?: () => string;
+};
+
+type UseResourceFormStateResult<TRecord, TInput> = {
+  currentRecord?: TRecord;
+  statusMessage: string | null;
+  setCurrentRecord: (record: TRecord | undefined) => void;
+  setStatusMessage: (message: string | null) => void;
+  handleSubmit: (input: TInput) => Promise<void>;
+};
+
+export const useResourceFormState = <TRecord, TInput>({
+  mode,
+  initialRecord,
+  createRecord,
+  updateRecord,
+  getRecordId,
+  entityLabel = "record",
+  getCreatedMessage,
+  getUpdatedMessage,
+  getMissingRecordMessage,
+}: UseResourceFormStateOptions<TRecord, TInput>): UseResourceFormStateResult<TRecord, TInput> => {
+  const [currentRecord, setCurrentRecord] = useState<TRecord | undefined>(initialRecord);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (input: TInput) => {
+    if (mode === "create") {
+      const created = await createRecord(input);
+      setCurrentRecord(created);
+      setStatusMessage(getCreatedMessage?.(created) ?? `Created ${getRecordId(created)}.`);
+      return;
+    }
+
+    if (!currentRecord) {
+      setStatusMessage(getMissingRecordMessage?.() ?? `No ${entityLabel} was available to update.`);
+      return;
+    }
+
+    const updated = await updateRecord(currentRecord, input);
+    setCurrentRecord(updated);
+    setStatusMessage(getUpdatedMessage?.(updated) ?? `Saved changes for ${getRecordId(updated)}.`);
+  };
+
+  return {
+    currentRecord,
+    statusMessage,
+    setCurrentRecord,
+    setStatusMessage,
+    handleSubmit,
+  };
+};
