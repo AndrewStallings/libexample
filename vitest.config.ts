@@ -10,6 +10,7 @@ export default defineConfig({
       "@/book-pages": path.resolve(__dirname, "./src/app/book-pages"),
       "@/books": path.resolve(__dirname, "./src/app/books"),
       "@/drop-box-locations": path.resolve(__dirname, "./src/app/drop-box-locations"),
+      "@/snacks": path.resolve(__dirname, "./src/app/snacks"),
       "@/reviews": path.resolve(__dirname, "./src/app/reviews"),
       "@/sales": path.resolve(__dirname, "./src/app/sales"),
       "@/testing": path.resolve(__dirname, "./src/testing"),

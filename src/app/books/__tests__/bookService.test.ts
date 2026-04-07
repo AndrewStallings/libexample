@@ -143,6 +143,10 @@ describe("createBookService", () => {
     );
 
     expect(result.success).toBe(false);
+    if (result.success) {
+      throw new Error("Expected validation to fail for the bad payload.");
+    }
+
     expect(result.error.issues.length).toBeGreaterThan(0);
   });
 
