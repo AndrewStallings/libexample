@@ -1,5 +1,4 @@
-import { createInMemoryRecordRepository } from "our-lib";
-import type { SnackInput, SnackRecord } from "@/snacks/models/schemas";
+import type { SnackRecord } from "@/snacks/models/schemas";
 
 export const initialSnacks: SnackRecord[] = [
   {
@@ -29,22 +28,3 @@ export const initialSnacks: SnackRecord[] = [
     updatedBy: "Peak Protein Co.",
   },
 ];
-
-export const createSnackRepository = () => {
-  return createInMemoryRecordRepository<SnackRecord, SnackInput, SnackInput>({
-    initialItems: initialSnacks,
-    getId: (record) => record.snackId,
-    createRecord: (input, currentItems) => ({
-      snackId: `SN-${7000 + currentItems.length + 1}`,
-      ...input,
-      updatedAt: new Date().toISOString(),
-      updatedBy: input.supplierName,
-    }),
-    updateRecord: (existing, input) => ({
-      ...existing,
-      ...input,
-      updatedAt: new Date().toISOString(),
-      updatedBy: input.supplierName,
-    }),
-  });
-};

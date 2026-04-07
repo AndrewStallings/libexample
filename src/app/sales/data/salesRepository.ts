@@ -132,7 +132,7 @@ export class InMemorySalesRepository implements SalesRepository {
 
     this.sales[index] = updatedRow;
     const record = joinSaleRecord(updatedRow, this.reviewers);
-    this.revisions.unshift(createRevision(id, record, userName, "edit"));
+    this.revisions.unshift(createRevision(String(id), record, userName, "edit"));
     return record;
   };
 
@@ -198,7 +198,7 @@ export class InMemorySalesRepository implements SalesRepository {
 
     this.sales[index] = restoredRow;
     const restoredRecord = joinSaleRecord(restoredRow, this.reviewers);
-    this.revisions.unshift(createRevision(saleId, restoredRecord, userName, "restore"));
+    this.revisions.unshift(createRevision(String(saleId), restoredRecord, userName, "restore"));
     return restoredRecord;
   };
 

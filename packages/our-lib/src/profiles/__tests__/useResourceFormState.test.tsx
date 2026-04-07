@@ -76,4 +76,29 @@ describe("useResourceFormState", () => {
 
     expect(result.current.statusMessage).toBe("No location was available to update.");
   });
+
+  it("formats numeric ids in the default status messages", async () => {
+    const createRecord = vi.fn(async (input: { name: string }) => ({
+      recordId: 0,
+      ...input,
+    }));
+
+    const { result } = renderHook(() =>
+      useResourceFormState({
+        mode: "create",
+        createRecord,
+        updateRecord: async (record: { recordId: number; name: string }, input: { name: string }) => ({
+          ...record,
+          ...input,
+        }),
+        getRecordId: (record) => record.recordId,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handleSubmit({ name: "Zero record" });
+    });
+
+    expect(result.current.statusMessage).toBe("Created 0.");
+  });
 });

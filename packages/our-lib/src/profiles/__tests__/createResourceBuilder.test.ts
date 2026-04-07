@@ -42,50 +42,62 @@ const seededSnack: SnackRecord = {
   updatedBy: "Northwind Snacks",
 };
 
-const snackResource = createResourceBuilder<SnackRecord, SnackInput>({
-  entityName: "snack",
-  route: "/snacks",
-  inputSchema: snackInputSchema,
-  getRecordId: (record) => record.snackId,
-  getRecordLabel: (record) => record.name,
-  getUpdatedAt: (record) => record.updatedAt,
-  getUpdatedBy: (record) => record.updatedBy,
-  createEmptyInput: () => ({
-    name: "",
-    category: "chips",
-    priceCents: 250,
-    stockCount: 0,
-    supplierName: "",
-    notes: "",
-  }),
-  cardFields: [
-    { section: "Identity", label: "Snack", prominent: true, value: (record) => record.name },
-    { section: "Inventory", label: "Stock", value: (record) => String(record.stockCount) },
-  ],
-  formFields: [
-    { key: "name", label: "Snack Name", kind: "text" },
-    {
-      key: "category",
-      label: "Category",
-      kind: "select",
-      options: [
-        { label: "Chips", value: "chips" },
-        { label: "Fruit", value: "fruit" },
-        { label: "Candy", value: "candy" },
-      ],
-    },
-    { key: "priceCents", label: "Price", kind: "number" },
-    { key: "stockCount", label: "Stock Count", kind: "number" },
-    { key: "supplierName", label: "Supplier", kind: "text" },
-    { key: "notes", label: "Notes", kind: "textarea" },
-  ],
-});
+const snackResource = createResourceBuilder<SnackRecord, SnackInput>()
+  .resource({
+    entityName: "snack",
+    route: "/snacks",
+    inputSchema: snackInputSchema,
+  })
+  .record({
+    getRecordId: (record) => record.snackId,
+    getRecordLabel: (record) => record.name,
+    getUpdatedAt: (record) => record.updatedAt,
+    getUpdatedBy: (record) => record.updatedBy,
+  })
+  .defaults({
+    createEmptyInput: () => ({
+      name: "",
+      category: "chips",
+      priceCents: 250,
+      stockCount: 0,
+      supplierName: "",
+      notes: "",
+    }),
+  })
+  .fields({
+    cardFields: [
+      { section: "Identity", label: "Snack", prominent: true, value: (record) => record.name },
+      { section: "Inventory", label: "Stock", value: (record) => String(record.stockCount) },
+    ],
+    formFields: [
+      { key: "name", label: "Snack Name", kind: "text" },
+      {
+        key: "category",
+        label: "Category",
+        kind: "select",
+        options: [
+          { label: "Chips", value: "chips" },
+          { label: "Fruit", value: "fruit" },
+          { label: "Candy", value: "candy" },
+        ],
+      },
+      { key: "priceCents", label: "Price", kind: "number" },
+      { key: "stockCount", label: "Stock Count", kind: "number" },
+      { key: "supplierName", label: "Supplier", kind: "text" },
+      { key: "notes", label: "Notes", kind: "textarea" },
+    ],
+  })
+  .build();
 
 describe("createResourceBuilder", () => {
   it("creates a generated profile with default titles and automatic record-to-input mapping", () => {
     expect(snackResource.profile.getFormTitle("create")).toBe("Create Snack");
     expect(snackResource.profile.getFormTitle("edit", seededSnack)).toBe("Edit Sea Salt Popcorn");
     expect(snackResource.profile.getSubmitLabel("edit")).toBe("Save snack");
+    expect(snackResource.navigation).toEqual({
+      backHref: "/snacks",
+      backLabel: "Back to snacks",
+    });
 
     expect(snackResource.toInput()).toEqual({
       name: "",

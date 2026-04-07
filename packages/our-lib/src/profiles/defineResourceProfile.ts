@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { ZodType } from "zod";
 import type { AsyncComboboxOption } from "../forms/Input";
-import type { SelectOption } from "../types/index";
+import type { EntityId, SelectOption, UpdatedAtValue } from "../types/index";
 
 export type ResourceCardField<TRecord> = {
   label: string;
@@ -45,8 +45,8 @@ export type ResourceFormField<TInput> =
 export type ResourceProfile<TRecord, TInput extends Record<string, unknown>> = {
   entityName: string;
   inputSchema: ZodType<TInput>;
-  getRecordId?: (record: TRecord) => string | undefined;
-  getUpdatedAt?: (record: TRecord) => string | undefined;
+  getRecordId?: (record: TRecord) => EntityId | undefined;
+  getUpdatedAt?: (record: TRecord) => UpdatedAtValue | undefined;
   getUpdatedBy?: (record: TRecord) => string | undefined;
   getFormTitle: (mode: "create" | "edit", record?: TRecord) => string;
   getSubmitLabel: (mode: "create" | "edit") => string;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { EntityId } from "../types/index";
 
 type ResourceFormMode = "create" | "edit";
 
@@ -9,7 +10,7 @@ type UseResourceFormStateOptions<TRecord, TInput> = {
   initialRecord?: TRecord;
   createRecord: (input: TInput) => Promise<TRecord>;
   updateRecord: (record: TRecord, input: TInput) => Promise<TRecord>;
-  getRecordId: (record: TRecord) => string;
+  getRecordId: (record: TRecord) => EntityId;
   entityLabel?: string;
   getCreatedMessage?: (record: TRecord) => string;
   getUpdatedMessage?: (record: TRecord) => string;
@@ -42,7 +43,7 @@ export const useResourceFormState = <TRecord, TInput>({
     if (mode === "create") {
       const created = await createRecord(input);
       setCurrentRecord(created);
-      setStatusMessage(getCreatedMessage?.(created) ?? `Created ${getRecordId(created)}.`);
+      setStatusMessage(getCreatedMessage?.(created) ?? `Created ${String(getRecordId(created))}.`);
       return;
     }
 
@@ -53,7 +54,7 @@ export const useResourceFormState = <TRecord, TInput>({
 
     const updated = await updateRecord(currentRecord, input);
     setCurrentRecord(updated);
-    setStatusMessage(getUpdatedMessage?.(updated) ?? `Saved changes for ${getRecordId(updated)}.`);
+    setStatusMessage(getUpdatedMessage?.(updated) ?? `Saved changes for ${String(getRecordId(updated))}.`);
   };
 
   return {

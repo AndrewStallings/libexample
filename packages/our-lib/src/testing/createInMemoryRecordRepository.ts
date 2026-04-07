@@ -6,6 +6,7 @@ type CreateInMemoryRecordRepositoryConfig<TRecord, TCreateInput, TUpdateInput> =
   getId(record: TRecord): EntityId;
   createRecord(input: TCreateInput, currentItems: TRecord[]): TRecord;
   updateRecord(existing: TRecord, input: TUpdateInput): TRecord;
+  insertPosition?: "prepend" | "append";
 };
 
 type InMemoryRecordRepository<TRecord, TCreateInput, TUpdateInput> = RecordRepository<TRecord, TCreateInput, TUpdateInput> & {
@@ -31,7 +32,7 @@ export const createInMemoryRecordRepository = <TRecord, TCreateInput, TUpdateInp
 
     create: async (input: TCreateInput) => {
       const created = config.createRecord(input, items);
-      items = [...items, created];
+      items = config.insertPosition === "prepend" ? [created, ...items] : [...items, created];
       return created;
     },
 

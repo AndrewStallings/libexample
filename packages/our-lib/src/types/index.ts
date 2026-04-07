@@ -1,7 +1,13 @@
-export type EntityId = string;
+export type EntityId = string | number;
+
+export type IsoDateTimeLike = {
+  toISO(): string | null;
+};
+
+export type UpdatedAtValue = string | Date | IsoDateTimeLike;
 
 export type AuditStamp = {
-  updatedAt: string;
+  updatedAt: UpdatedAtValue;
   updatedBy: string;
 };
 

@@ -1,18 +1,7 @@
-import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { clickButton, fillFormFields } from "our-lib";
 import { SnackFormPage } from "@/snacks/components/SnackFormPage";
-
-vi.mock("next/link", () => {
-  return {
-    default: ({ children, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
-      <a href={href} {...props}>
-        {children}
-      </a>
-    ),
-  };
-});
 
 describe("SnackFormPage", () => {
   it("submits the generated snack form", async () => {

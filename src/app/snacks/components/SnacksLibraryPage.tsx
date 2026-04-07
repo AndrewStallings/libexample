@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ResourceCard, cardActionClassName } from "our-lib";
-import { initialSnacks } from "@/snacks/data/snackRepository";
+import { initialSnacks } from "@/snacks/data/snackSeedData";
 import { snackResource } from "@/snacks/models/resource";
 
 export const SnacksLibraryPage = () => {

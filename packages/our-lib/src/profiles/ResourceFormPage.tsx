@@ -3,52 +3,88 @@
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 import { FormPageShell } from "../forms/index";
+import type { ResourceBuilderResult } from "./createResourceBuilder";
 import type { ResourceProfile } from "./defineResourceProfile";
 import { ResourceForm } from "./ResourceForm";
 import { useResourceFormState } from "./useResourceFormState";
 
+const humanizeBackLabel = (href?: string) => {
+  if (!href) {
+    return undefined;
+  }
+
+  const segment = href.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean).at(-1);
+  if (!segment) {
+    return undefined;
+  }
+
+  const label = segment
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[-_]+/g, " ")
+    .trim()
+    .toLowerCase();
+
+  return label ? `Back to ${label}` : undefined;
+};
+
 type ResourceFormPageProps<TService, TRecord, TInput extends Record<string, unknown>> = {
   mode: "create" | "edit";
   record?: TRecord;
-  profile: ResourceProfile<TRecord, TInput>;
   createService: () => TService;
-  toInput: (record?: TRecord) => TInput;
-  backHref: string;
-  backLabel: string;
   description: string;
   entityLabel?: string;
-  getRecordId?: (record: TRecord) => string;
+  getRecordId?: (record: TRecord) => import("../types/index").EntityId;
   createRecord: (service: TService, input: TInput) => Promise<TRecord>;
   updateRecord: (service: TService, record: TRecord, input: TInput) => Promise<TRecord>;
-  renderBackLink: (props: { href: string; className: string; children: ReactNode }) => ReactNode;
+  resource?: Pick<ResourceBuilderResult<TRecord, TInput>, "profile" | "toInput" | "route" | "entityLabel" | "navigation">;
+  profile?: ResourceProfile<TRecord, TInput>;
+  toInput?: (record?: TRecord) => TInput;
+  backHref?: string;
+  backLabel?: string;
+  renderBackLink?: (props: { href: string; className: string; children: ReactNode }) => ReactNode;
 };
 
 export const ResourceFormPage = <TService, TRecord, TInput extends Record<string, unknown>>({
   mode,
   record,
-  profile,
   createService,
-  toInput,
-  backHref,
-  backLabel,
   description,
   entityLabel,
   getRecordId,
   createRecord,
   updateRecord,
+  resource,
+  profile,
+  toInput,
+  backHref,
+  backLabel,
   renderBackLink,
 }: ResourceFormPageProps<TService, TRecord, TInput>) => {
   const service = useMemo(() => createService(), [createService]);
-  const resolveRecordId = getRecordId ?? profile.getRecordId;
+  const resolvedProfile = resource?.profile ?? profile;
+  const resolvedToInput = resource?.toInput ?? toInput;
+
+  if (!resolvedProfile) {
+    throw new Error("ResourceFormPage requires a resource.profile or profile prop.");
+  }
+
+  if (!resolvedToInput) {
+    throw new Error("ResourceFormPage requires a resource.toInput or toInput prop.");
+  }
+
+  const resolvedBackHref = backHref ?? resource?.navigation?.backHref ?? resource?.route;
+  const resolvedBackLabel = backLabel ?? resource?.navigation?.backLabel ?? humanizeBackLabel(resolvedBackHref);
+  const resolvedEntityLabel = entityLabel ?? resource?.entityLabel;
+  const resolveRecordId = getRecordId ?? resolvedProfile.getRecordId;
 
   if (!resolveRecordId) {
-    throw new Error(`ResourceFormPage requires getRecordId or profile.getRecordId for ${profile.entityName}.`);
+    throw new Error(`ResourceFormPage requires getRecordId or profile.getRecordId for ${resolvedProfile.entityName}.`);
   }
 
   const requiredRecordId = (record: TRecord) => {
     const recordId = resolveRecordId(record);
-    if (!recordId) {
-      throw new Error(`ResourceFormPage expected a record id for ${profile.entityName}.`);
+    if (recordId === undefined || recordId === null) {
+      throw new Error(`ResourceFormPage expected a record id for ${resolvedProfile.entityName}.`);
     }
     return recordId;
   };
@@ -59,23 +95,23 @@ export const ResourceFormPage = <TService, TRecord, TInput extends Record<string
     createRecord: (input) => createRecord(service, input),
     updateRecord: (currentRecordValue, input) => updateRecord(service, currentRecordValue, input),
     getRecordId: requiredRecordId,
-    entityLabel,
+    entityLabel: resolvedEntityLabel,
   });
 
   return (
     <FormPageShell
-      backHref={backHref}
-      backLabel={backLabel}
-      title={profile.getFormTitle(mode, currentRecord)}
+      backHref={resolvedBackHref}
+      backLabel={resolvedBackLabel}
+      title={resolvedProfile.getFormTitle(mode, currentRecord)}
       description={description}
       statusMessage={statusMessage}
       renderBackLink={renderBackLink}
     >
       <ResourceForm
-        initialValue={toInput(currentRecord)}
+        initialValue={resolvedToInput(currentRecord)}
         mode={mode}
         onSubmit={handleSubmit}
-        profile={profile}
+        profile={resolvedProfile}
         record={currentRecord}
       />
     </FormPageShell>
