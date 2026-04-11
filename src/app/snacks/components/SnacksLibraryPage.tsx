@@ -1,9 +1,27 @@
-import Link from "next/link";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { ResourceCard, cardActionClassName } from "our-lib";
-import { initialSnacks } from "@/snacks/data/snackSeedData";
+import { SnackFormPage } from "@/snacks/components/SnackFormPage";
 import { snackResource } from "@/snacks/models/resource";
+import type { SnackRecord } from "@/snacks/models/schemas";
+import { listSnacks } from "@/snacks/services/snackDemoService";
+import { queryKeys } from "@/config/queryKeys";
 
 export const SnacksLibraryPage = () => {
+  const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<SnackRecord | undefined>();
+  const { data: snacks = [] } = useQuery({
+    queryKey: queryKeys.snacks,
+    queryFn: listSnacks,
+  });
+
+  const closePanel = () => {
+    setPanelMode(null);
+    setSelectedRecord(undefined);
+  };
+
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-10 md:px-8">
       <section className="max-w-4xl">
@@ -16,26 +34,42 @@ export const SnacksLibraryPage = () => {
           service template, and default input mapping.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90" href="/snacks/new">
+          <button
+            className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            onClick={() => {
+              setSelectedRecord(undefined);
+              setPanelMode("create");
+            }}
+            type="button"
+          >
             Create Snack
-          </Link>
+          </button>
         </div>
       </section>
 
       <section className="space-y-6">
-        {initialSnacks.map((record) => (
+        {snacks.map((record) => (
           <ResourceCard
             key={record.snackId}
             actions={
-              <Link className={cardActionClassName} href={`/snacks/${record.snackId}`}>
+              <button
+                className={cardActionClassName}
+                onClick={() => {
+                  setSelectedRecord(record);
+                  setPanelMode("edit");
+                }}
+                type="button"
+              >
                 Open Form
-              </Link>
+              </button>
             }
             profile={snackResource.profile}
             record={record}
           />
         ))}
       </section>
+
+      <SnackFormPage isOpen={panelMode !== null} mode={panelMode ?? "create"} onClose={closePanel} record={selectedRecord} />
     </main>
   );
 };

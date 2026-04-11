@@ -1,8 +1,8 @@
-import { InMemoryAuditLogger } from "our-lib";
 import { InMemoryReviewRepository, initialReviewRows } from "@/reviews/data/reviewRepository";
 import { reviewTypes, reviewerOptions } from "@/reviews/models/lookupData";
 import type { ReviewInput, ReviewRecord } from "@/reviews/models/schemas";
 import { createReviewService } from "@/reviews/services/reviewService";
+import { createAppAuditLogger } from "@/config/auditLogger";
 
 const toReviewRecord = (row: (typeof initialReviewRows)[number]): ReviewRecord => {
   const reviewType = reviewTypes.find((item) => item.reviewTypeId === row.reviewTypeId);
@@ -22,8 +22,32 @@ const toReviewRecord = (row: (typeof initialReviewRows)[number]): ReviewRecord =
   };
 };
 
+const createReviewDemoStore = () => {
+  const repository = new InMemoryReviewRepository();
+
+  return {
+    repository,
+    service: createReviewService(repository, createAppAuditLogger()),
+  };
+};
+
+let reviewDemoStore = createReviewDemoStore();
+
 export const createReviewDemoService = () => {
-  return createReviewService(new InMemoryReviewRepository(), new InMemoryAuditLogger());
+  return reviewDemoStore.service;
+};
+
+export const listReviews = async (): Promise<ReviewRecord[]> => {
+  const result = await reviewDemoStore.service.list();
+  return result.items;
+};
+
+export const getReviewRecordById = async (reviewId: string): Promise<ReviewRecord | undefined> => {
+  return (await reviewDemoStore.service.getById(reviewId)) ?? undefined;
+};
+
+export const resetReviewDemoStore = () => {
+  reviewDemoStore = createReviewDemoStore();
 };
 
 export const getReviewById = (reviewId: string): ReviewRecord | undefined => {

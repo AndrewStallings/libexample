@@ -1,8 +1,9 @@
-import { createRecordResource, InMemoryAuditLogger } from "our-lib";
+import { createRecordResource, type AuditLogger } from "our-lib";
 import { bookPageInputSchema, type BookPageInput } from "@/book-pages/models/schemas";
 import type { BookPageRepository } from "@/book-pages/data/bookPageRepository";
+import { createAppAuditLogger } from "@/config/auditLogger";
 
-export const createBookPageService = (repository: BookPageRepository, logger = new InMemoryAuditLogger()) => {
+export const createBookPageService = (repository: BookPageRepository, logger: AuditLogger = createAppAuditLogger()) => {
   const resource = createRecordResource({
     entityName: "bookPage",
     repository,

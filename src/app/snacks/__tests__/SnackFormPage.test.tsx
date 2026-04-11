@@ -1,11 +1,12 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { clickButton, fillFormFields } from "our-lib";
 import { SnackFormPage } from "@/snacks/components/SnackFormPage";
+import { renderWithAppProviders } from "@/testing/renderWithAppProviders";
 
 describe("SnackFormPage", () => {
   it("submits the generated snack form", async () => {
-    render(<SnackFormPage mode="create" />);
+    renderWithAppProviders(<SnackFormPage mode="create" />);
 
     fillFormFields({
       "Snack Name": "Chili Citrus Trail Mix",

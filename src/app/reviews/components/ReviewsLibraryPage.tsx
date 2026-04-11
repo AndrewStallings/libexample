@@ -1,7 +1,13 @@
-import Link from "next/link";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
-import { initialReviewRows } from "@/reviews/data/reviewRepository";
+import { ReviewFormPage } from "@/reviews/components/ReviewFormPage";
+import type { ReviewRecord } from "@/reviews/models/schemas";
 import { reviewTypes, reviewerOptions } from "@/reviews/models/lookupData";
+import { listReviews } from "@/reviews/services/reviewDemoService";
+import { queryKeys } from "@/config/queryKeys";
 
 const getReviewTypeName = (reviewTypeId: string) => {
   return reviewTypes.find((item) => item.reviewTypeId === reviewTypeId)?.type ?? reviewTypeId;
@@ -16,9 +22,21 @@ const formatStatus = (status: string) => {
 };
 
 export const ReviewsLibraryPage = () => {
+  const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<ReviewRecord | undefined>();
+  const { data: reviews = [] } = useQuery({
+    queryKey: queryKeys.reviews,
+    queryFn: listReviews,
+  });
+
   const createButtonStyle = {
     backgroundColor: "var(--accent)",
   } as const;
+
+  const closePanel = () => {
+    setPanelMode(null);
+    setSelectedRecord(undefined);
+  };
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-10 md:px-8">
@@ -32,14 +50,22 @@ export const ReviewsLibraryPage = () => {
           enriched record shape.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link className="rounded-full px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90" href="/reviews/new" style={createButtonStyle}>
+          <button
+            className="rounded-full px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            onClick={() => {
+              setSelectedRecord(undefined);
+              setPanelMode("create");
+            }}
+            style={createButtonStyle}
+            type="button"
+          >
             Create Review
-          </Link>
+          </button>
         </div>
       </section>
 
       <section className="space-y-6">
-        {initialReviewRows.map((record) => (
+        {reviews.map((record) => (
           <EntityCard
             key={record.reviewId}
             sections={[
@@ -63,9 +89,16 @@ export const ReviewsLibraryPage = () => {
             ]}
             actions={
               <>
-                <Link className={cardActionClassName} href={`/reviews/${record.reviewId}`}>
+                <button
+                  className={cardActionClassName}
+                  onClick={() => {
+                    setSelectedRecord(record);
+                    setPanelMode("edit");
+                  }}
+                  type="button"
+                >
                   Open Form
-                </Link>
+                </button>
                 <CardActionButton>View Audit</CardActionButton>
                 {record.status === "open" ? <CardActionButton>Escalate</CardActionButton> : null}
               </>
@@ -73,6 +106,8 @@ export const ReviewsLibraryPage = () => {
           />
         ))}
       </section>
+
+      <ReviewFormPage isOpen={panelMode !== null} mode={panelMode ?? "create"} onClose={closePanel} record={selectedRecord} />
     </main>
   );
 };

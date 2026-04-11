@@ -1,11 +1,12 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { InMemoryAuditLogger } from "our-lib";
 import { canViewSalesTracker } from "@/sales/logic/rules";
 import { InMemorySalesRepository } from "@/sales/data/salesRepository";
 import type { SaleInput, SaleRecord, SaleRevision, SalesUser } from "@/sales/models/schemas";
 import { createSalesService } from "@/sales/services/salesService";
+import { createAppAuditLogger } from "@/config/auditLogger";
+import { subscribeToRecordMutations } from "@/config/recordMutations";
 
 const currentUser: SalesUser = {
   userId: "sales-sally",
@@ -13,7 +14,7 @@ const currentUser: SalesUser = {
 };
 
 const repository = new InMemorySalesRepository();
-const logger = new InMemoryAuditLogger();
+const logger = createAppAuditLogger();
 const service = createSalesService(repository, logger);
 
 type SalesDemoState = {
@@ -33,6 +34,24 @@ const emit = () => {
   listeners.forEach((listener) => listener());
 };
 
+const applySaleRecord = (record: SaleRecord) => {
+  state = {
+    ...state,
+    sales: state.sales.some((item) => item.saleId === record.saleId)
+      ? state.sales.map((item) => (item.saleId === record.saleId ? record : item))
+      : [record, ...state.sales],
+  };
+  emit();
+};
+
+const removeSaleRecord = (saleId: string | number) => {
+  state = {
+    ...state,
+    sales: state.sales.filter((item) => item.saleId !== saleId),
+  };
+  emit();
+};
+
 const refreshSales = async () => {
   state = {
     ...state,
@@ -49,7 +68,20 @@ const init = async () => {
   await refreshSales();
 };
 
-void init();
+void init().then(() => {
+  subscribeToRecordMutations((event) => {
+    if (event.entity !== "sale") {
+      return;
+    }
+
+    if (event.mutation === "delete") {
+      removeSaleRecord(event.recordId);
+      return;
+    }
+
+    applySaleRecord(event.record as SaleRecord);
+  });
+});
 
 export const salesDemoStore = {
   subscribe: (listener: () => void) => {

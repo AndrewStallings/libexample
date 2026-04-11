@@ -1,20 +1,37 @@
+"use client";
+
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
-import { getBookPagesByBookId } from "@/book-pages/services/bookPageDemoService";
+import { BookPageFormPage } from "@/book-pages/components/BookPageFormPage";
+import { listBookPagesByBookId } from "@/book-pages/services/bookPageDemoService";
+import type { BookPageRecord } from "@/book-pages/models/schemas";
 import type { BookRecord } from "@/books/models/schemas";
+import { queryKeys } from "@/config/queryKeys";
 
 type BookPagesLibraryPageProps = {
   book: BookRecord;
 };
 
 export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
-  const pageRecords = getBookPagesByBookId(book.bookId);
+  const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<BookPageRecord | undefined>();
+  const { data: pageRecords = [] } = useQuery({
+    queryKey: queryKeys.bookPages(book.bookId),
+    queryFn: () => listBookPagesByBookId(book.bookId),
+  });
+
+  const closePanel = () => {
+    setPanelMode(null);
+    setSelectedRecord(undefined);
+  };
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-10 md:px-8">
       <section className="max-w-5xl">
-        <Link className="text-sm font-semibold transition hover:opacity-80" href={`/books/${book.bookId}`}>
-          Back to {book.title}
+        <Link className="text-sm font-semibold transition hover:opacity-80" href="/books">
+          Back to books
         </Link>
         <p className="mt-4 text-sm uppercase tracking-widest" style={{ color: "var(--accent)" }}>
           Child Records Stress Test
@@ -24,9 +41,16 @@ export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
           Each page card shows 15 data points to pressure-test the viewing abstraction with a denser child-record surface.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90" href={`/book-pages/${book.bookId}/new`}>
+          <button
+            className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            onClick={() => {
+              setSelectedRecord(undefined);
+              setPanelMode("create");
+            }}
+            type="button"
+          >
             Create Page
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -78,9 +102,16 @@ export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
             ]}
             actions={
               <>
-                <Link className={cardActionClassName} href={`/book-pages/${book.bookId}/${record.pageId}`}>
+                <button
+                  className={cardActionClassName}
+                  onClick={() => {
+                    setSelectedRecord(record);
+                    setPanelMode("edit");
+                  }}
+                  type="button"
+                >
                   Open Page
-                </Link>
+                </button>
                 <CardActionButton>Preview Content</CardActionButton>
                 <CardActionButton>Open Revision Trail</CardActionButton>
               </>
@@ -88,6 +119,8 @@ export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
           />
         ))}
       </section>
+
+      <BookPageFormPage book={book} isOpen={panelMode !== null} mode={panelMode ?? "create"} onClose={closePanel} pageRecord={selectedRecord} />
     </main>
   );
 };

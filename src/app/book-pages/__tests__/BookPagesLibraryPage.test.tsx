@@ -1,8 +1,9 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookPagesLibraryPage } from "@/book-pages/components/BookPagesLibraryPage";
 import { getBookById } from "@/books/services/bookDemoService";
+import { renderWithAppProviders } from "@/testing/renderWithAppProviders";
 
 vi.mock("next/link", () => {
   return {
@@ -15,17 +16,17 @@ vi.mock("next/link", () => {
 });
 
 describe("BookPagesLibraryPage", () => {
-  it("renders dense child-record cards and page links", () => {
+  it("renders dense child-record cards and page links", async () => {
     const book = getBookById("BK-1001");
     if (!book) {
       throw new Error("Expected test book to exist.");
     }
 
-    render(<BookPagesLibraryPage book={book} />);
+    renderWithAppProviders(<BookPagesLibraryPage book={book} />);
 
     expect(screen.getByText("API Standards Handbook Pages")).toBeInTheDocument();
-    expect(screen.getByText("Authentication Overview")).toBeInTheDocument();
-    expect(screen.getByText("Page - PG-4002")).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: "Open Page" })).toHaveLength(2);
+    expect(await screen.findByText("Authentication Overview")).toBeInTheDocument();
+    expect(await screen.findByText("Page - PG-4002")).toBeInTheDocument();
+    expect(await screen.findAllByRole("button", { name: "Open Page" })).toHaveLength(2);
   });
 });

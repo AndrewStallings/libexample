@@ -1,12 +1,13 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { clickButton, fillFormFields } from "our-lib";
 import { DropBoxLocationFormPage } from "@/drop-box-locations/components/DropBoxLocationFormPage";
+import { renderWithAppProviders } from "@/testing/renderWithAppProviders";
 
 describe("DropBoxLocationFormPage", () => {
   it("submits a generated form layout", async () => {
-    render(<DropBoxLocationFormPage mode="create" />);
+    renderWithAppProviders(<DropBoxLocationFormPage mode="create" />);
 
     fillFormFields({
       "Location Name": "South Campus West Wing",

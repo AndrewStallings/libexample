@@ -28,18 +28,23 @@ export interface RecordRepository<TRecord, TCreateInput, TUpdateInput> {
 
 export type LogSeverity = "trace" | "info" | "warn" | "error";
 
+export type LogEntryBase = {
+  time: string;
+  severity: LogSeverity;
+};
+
+export interface Logger<TEntry> {
+  write(entry: TEntry): Promise<void>;
+}
+
 export type AuditLogEntry = {
   server: string;
   shortNote: string;
   longNote?: string;
-  time: string;
   source: string;
   category: string;
-  severity: LogSeverity;
   route: string;
   userId: string;
-};
+} & LogEntryBase;
 
-export interface AuditLogger {
-  write(entry: AuditLogEntry): Promise<void>;
-}
+export interface AuditLogger extends Logger<AuditLogEntry> {}

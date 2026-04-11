@@ -1,9 +1,10 @@
 import { z } from "zod";
-import { createRecordResource, type AuditLogger, type RecordRepository } from "our-lib";
+import { createRecordResource, type AuditLogger } from "our-lib";
+import type { BookRepository } from "@/books/data/bookRepository";
 import { bookInputSchema, type BookInput, type BookRecord } from "@/books/models/schemas";
 
 export const createBookService = (
-  repository: RecordRepository<BookRecord, BookInput, BookInput>,
+  repository: BookRepository,
   logger: AuditLogger,
 ) => {
   const resource = createRecordResource({

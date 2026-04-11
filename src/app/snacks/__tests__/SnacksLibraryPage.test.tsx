@@ -1,7 +1,8 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { SnacksLibraryPage } from "@/snacks/components/SnacksLibraryPage";
+import { renderWithAppProviders } from "@/testing/renderWithAppProviders";
 
 vi.mock("next/link", () => {
   return {
@@ -14,11 +15,11 @@ vi.mock("next/link", () => {
 });
 
 describe("SnacksLibraryPage", () => {
-  it("renders generated snack cards and form links", () => {
-    render(<SnacksLibraryPage />);
+  it("renders generated snack cards and form links", async () => {
+    renderWithAppProviders(<SnacksLibraryPage />);
 
     expect(screen.getByText("Snacks are driven by a single reusable resource definition.")).toBeInTheDocument();
-    expect(screen.getByText("Sea Salt Popcorn")).toBeInTheDocument();
-    expect(screen.getAllByRole("link", { name: "Open Form" })).toHaveLength(2);
+    expect(await screen.findByText("Sea Salt Popcorn")).toBeInTheDocument();
+    expect(await screen.findAllByRole("button", { name: "Open Form" })).toHaveLength(2);
   });
 });

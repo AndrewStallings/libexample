@@ -1,9 +1,27 @@
-import Link from "next/link";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { ResourceCard, cardActionClassName } from "our-lib";
 import { dropBoxLocationProfile } from "@/drop-box-locations/models/profile";
-import { initialDropBoxLocations } from "@/drop-box-locations/data/dropBoxLocationRepository";
+import { DropBoxLocationFormPage } from "@/drop-box-locations/components/DropBoxLocationFormPage";
+import type { DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
+import { listDropBoxLocations } from "@/drop-box-locations/services/dropBoxLocationDemoService";
+import { queryKeys } from "@/config/queryKeys";
 
 export const DropBoxLocationsLibraryPage = () => {
+  const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<DropBoxLocationRecord | undefined>();
+  const { data: locations = [] } = useQuery({
+    queryKey: queryKeys.dropBoxLocations,
+    queryFn: listDropBoxLocations,
+  });
+
+  const closePanel = () => {
+    setPanelMode(null);
+    setSelectedRecord(undefined);
+  };
+
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-10 md:px-8">
       <section className="max-w-4xl">
@@ -15,26 +33,47 @@ export const DropBoxLocationsLibraryPage = () => {
           This feature is meant to prove a lower-effort path: after Drizzle and Zod schemas exist, a developer mostly defines a typed resource profile.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90" href="/drop-box-locations/new">
+          <button
+            className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            onClick={() => {
+              setSelectedRecord(undefined);
+              setPanelMode("create");
+            }}
+            type="button"
+          >
             Create Location
-          </Link>
+          </button>
         </div>
       </section>
 
       <section className="space-y-6">
-        {initialDropBoxLocations.map((record) => (
+        {locations.map((record) => (
           <ResourceCard
             key={record.locationId}
             actions={
-              <Link className={cardActionClassName} href={`/drop-box-locations/${record.locationId}`}>
+              <button
+                className={cardActionClassName}
+                onClick={() => {
+                  setSelectedRecord(record);
+                  setPanelMode("edit");
+                }}
+                type="button"
+              >
                 Open Form
-              </Link>
+              </button>
             }
             profile={dropBoxLocationProfile}
             record={record}
           />
         ))}
       </section>
+
+      <DropBoxLocationFormPage
+        isOpen={panelMode !== null}
+        mode={panelMode ?? "create"}
+        onClose={closePanel}
+        record={selectedRecord}
+      />
     </main>
   );
 };

@@ -1,25 +1,58 @@
 "use client";
 
-import { ResourceFormPage } from "our-lib";
+import { useQueryClient } from "@tanstack/react-query";
+import { ResourceForm, useResourceFormState } from "our-lib";
+import { useEffect } from "react";
+import { SidePanelShell } from "@/app/components/SidePanelShell";
+import { queryKeys } from "@/config/queryKeys";
 import { snackResource } from "@/snacks/models/resource";
-import type { SnackRecord } from "@/snacks/models/schemas";
+import type { SnackInput, SnackRecord } from "@/snacks/models/schemas";
 import { createSnackDemoService } from "@/snacks/services/snackDemoService";
 
 type SnackFormPageProps = {
   mode: "create" | "edit";
   record?: SnackRecord;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
-export const SnackFormPage = ({ mode, record }: SnackFormPageProps) => {
+export const SnackFormPage = ({ mode, record, isOpen = true, onClose }: SnackFormPageProps) => {
+  const queryClient = useQueryClient();
+  const service = createSnackDemoService();
+  const { currentRecord, statusMessage, setCurrentRecord, setStatusMessage, handleSubmit } = useResourceFormState<SnackRecord, SnackInput>({
+    mode,
+    initialRecord: record,
+    createRecord: (input) => service.create(input, "demo-user"),
+    updateRecord: (currentRecordValue, input) => service.update(currentRecordValue.snackId, input, "demo-user"),
+    getRecordId: (currentRecordValue) => currentRecordValue.snackId,
+    entityLabel: "snack",
+    onSubmitted: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.snacks });
+      onClose?.();
+    },
+  });
+
+  useEffect(() => {
+    setCurrentRecord(record);
+    setStatusMessage(null);
+  }, [isOpen, mode, record, setCurrentRecord, setStatusMessage]);
+
   return (
-    <ResourceFormPage
-      createRecord={(service, input) => service.create(input, "demo-user")}
-      createService={createSnackDemoService}
-      description="This form is generated from the shared resource builder so new CRUD screens can stay close to their schema."
-      mode={mode}
-      record={record}
-      resource={snackResource}
-      updateRecord={(service, currentRecord, input) => service.update(currentRecord.snackId, input, "demo-user")}
-    />
+    <SidePanelShell
+      description="This resource-driven form now slides in beside the snack cards and refreshes the collection through query invalidation."
+      isOpen={isOpen}
+      onClose={onClose}
+      statusMessage={statusMessage}
+      title={snackResource.profile.getFormTitle(mode, currentRecord)}
+    >
+      <ResourceForm
+        initialValue={snackResource.toInput(currentRecord)}
+        key={currentRecord?.snackId ?? "new-snack"}
+        mode={mode}
+        onSubmit={handleSubmit}
+        profile={snackResource.profile}
+        record={currentRecord}
+      />
+    </SidePanelShell>
   );
 };

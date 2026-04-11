@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { FormPageShell } from "our-lib";
 import { SalesForm } from "@/sales/components/SalesForm";
 import { salesDemoStore, useSalesDemoStore } from "@/sales/services/salesDemoStore";
 import type { SaleInput, SaleRecord, SaleRevision } from "@/sales/models/schemas";
+import { finalizePopupMutation } from "@/config/recordMutations";
 
 type SalesFormPageProps = {
   mode: "create" | "edit";
@@ -68,12 +70,19 @@ const demoBatchImport: SaleInput[] = [
 ];
 
 export const SalesFormPage = ({ mode, saleId }: SalesFormPageProps) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { sales } = useSalesDemoStore();
   const [currentMode, setCurrentMode] = useState<"create" | "edit" | "read">(mode === "create" ? "create" : "read");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [revisions, setRevisions] = useState<SaleRevision[]>([]);
   const [deleteReason, setDeleteReason] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const returnTo = searchParams.get("returnTo") ?? "/sales";
+
+  const navigateBackToList = () => {
+    router.push(returnTo);
+  };
 
   const currentRecord = useMemo(() => {
     return sales.find((item) => item.saleId === saleId);
@@ -140,6 +149,12 @@ export const SalesFormPage = ({ mode, saleId }: SalesFormPageProps) => {
           if (currentMode === "create") {
             const created = await salesDemoStore.create(value);
             setStatusMessage(`Created ${created.saleId}.`);
+            finalizePopupMutation({
+              entity: "sale",
+              mutation: "create",
+              record: created,
+            });
+            navigateBackToList();
             return;
           }
 
@@ -149,6 +164,12 @@ export const SalesFormPage = ({ mode, saleId }: SalesFormPageProps) => {
 
           const updated = await salesDemoStore.update(saleId, value);
           setStatusMessage(`Saved changes for ${updated.saleId}.`);
+          finalizePopupMutation({
+            entity: "sale",
+            mutation: "update",
+            record: updated,
+          });
+          navigateBackToList();
         }}
         record={currentRecord}
       />
@@ -204,7 +225,13 @@ export const SalesFormPage = ({ mode, saleId }: SalesFormPageProps) => {
                         ? `Deleted ${result.deletedSaleId} and reviewer ${result.deletedReviewerId} because it was the last sale.`
                         : `Deleted ${result.deletedSaleId}.`,
                     );
+                    finalizePopupMutation({
+                      entity: "sale",
+                      mutation: "delete",
+                      recordId: result.deletedSaleId,
+                    });
                     setShowDeleteConfirm(false);
+                    navigateBackToList();
                   })
                 }
                 type="button"

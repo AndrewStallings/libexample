@@ -1,34 +1,38 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import { FormPageShell } from "our-lib";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { ReviewForm } from "@/reviews/components/ReviewForm";
 import { createReviewDemoService, toReviewInput } from "@/reviews/services/reviewDemoService";
 import type { ReviewRecord } from "@/reviews/models/schemas";
+import { SidePanelShell } from "@/app/components/SidePanelShell";
+import { queryKeys } from "@/config/queryKeys";
 
 type ReviewFormPageProps = {
   mode: "create" | "edit";
   record?: ReviewRecord;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
-export const ReviewFormPage = ({ mode, record }: ReviewFormPageProps) => {
-  const service = useMemo(() => createReviewDemoService(), []);
+export const ReviewFormPage = ({ mode, record, isOpen = true, onClose }: ReviewFormPageProps) => {
+  const queryClient = useQueryClient();
+  const service = createReviewDemoService();
   const [currentRecord, setCurrentRecord] = useState<ReviewRecord | undefined>(record);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    setCurrentRecord(record);
+    setStatusMessage(null);
+  }, [isOpen, mode, record]);
+
   return (
-    <FormPageShell
-      backHref="/reviews"
-      backLabel="Back to review cards"
-      title={mode === "create" ? "Create a new review" : `Edit ${currentRecord?.subject ?? "review"}`}
-      description="This route shows the same library form shell against a different feature and joined lookup data."
+    <SidePanelShell
+      description="The review editor now lives in a side panel so we can keep the joined review cards visible while mutations refresh the list."
+      isOpen={isOpen}
+      onClose={onClose}
       statusMessage={statusMessage}
-      renderBackLink={({ href, className, children }) => (
-        <Link className={className} href={href}>
-          {children}
-        </Link>
-      )}
+      title={mode === "create" ? "Create a new review" : `Edit ${currentRecord?.subject ?? "review"}`}
     >
       <ReviewForm
         key={currentRecord?.reviewId ?? "new-review"}
@@ -40,6 +44,8 @@ export const ReviewFormPage = ({ mode, record }: ReviewFormPageProps) => {
             const created = await service.create(value, "demo-user");
             setCurrentRecord(created);
             setStatusMessage(`Created ${created.reviewId}.`);
+            await queryClient.invalidateQueries({ queryKey: queryKeys.reviews });
+            onClose?.();
             return;
           }
 
@@ -51,8 +57,10 @@ export const ReviewFormPage = ({ mode, record }: ReviewFormPageProps) => {
           const updated = await service.update(currentRecord.reviewId, value, "demo-user");
           setCurrentRecord(updated);
           setStatusMessage(`Saved changes for ${updated.reviewId}.`);
+          await queryClient.invalidateQueries({ queryKey: queryKeys.reviews });
+          onClose?.();
         }}
       />
-    </FormPageShell>
+    </SidePanelShell>
   );
 };

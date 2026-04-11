@@ -10,6 +10,7 @@ type UseResourceFormStateOptions<TRecord, TInput> = {
   initialRecord?: TRecord;
   createRecord: (input: TInput) => Promise<TRecord>;
   updateRecord: (record: TRecord, input: TInput) => Promise<TRecord>;
+  onSubmitted?: (record: TRecord, mode: ResourceFormMode) => Promise<void> | void;
   getRecordId: (record: TRecord) => EntityId;
   entityLabel?: string;
   getCreatedMessage?: (record: TRecord) => string;
@@ -30,6 +31,7 @@ export const useResourceFormState = <TRecord, TInput>({
   initialRecord,
   createRecord,
   updateRecord,
+  onSubmitted,
   getRecordId,
   entityLabel = "record",
   getCreatedMessage,
@@ -44,6 +46,7 @@ export const useResourceFormState = <TRecord, TInput>({
       const created = await createRecord(input);
       setCurrentRecord(created);
       setStatusMessage(getCreatedMessage?.(created) ?? `Created ${String(getRecordId(created))}.`);
+      await onSubmitted?.(created, mode);
       return;
     }
 
@@ -55,6 +58,7 @@ export const useResourceFormState = <TRecord, TInput>({
     const updated = await updateRecord(currentRecord, input);
     setCurrentRecord(updated);
     setStatusMessage(getUpdatedMessage?.(updated) ?? `Saved changes for ${String(getRecordId(updated))}.`);
+    await onSubmitted?.(updated, mode);
   };
 
   return {

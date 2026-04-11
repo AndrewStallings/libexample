@@ -1,15 +1,34 @@
+"use client";
+
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
-import { initialBooks } from "@/books/data/bookRepository";
+import { BookFormPage } from "@/books/components/BookFormPage";
+import type { BookRecord } from "@/books/models/schemas";
+import { listBooks } from "@/books/services/bookDemoService";
+import { queryKeys } from "@/config/queryKeys";
 
 const formatStatus = (status: string) => {
   return status[0]?.toUpperCase() + status.slice(1);
 };
 
 export const BooksLibraryPage = () => {
+  const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<BookRecord | undefined>();
+  const { data: books = [] } = useQuery({
+    queryKey: queryKeys.books,
+    queryFn: listBooks,
+  });
+
   const createButtonStyle = {
     backgroundColor: "var(--accent)",
   } as const;
+
+  const closePanel = () => {
+    setPanelMode(null);
+    setSelectedRecord(undefined);
+  };
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-10 md:px-8">
@@ -17,20 +36,28 @@ export const BooksLibraryPage = () => {
         <p className="text-sm uppercase tracking-widest" style={{ color: "var(--accent)" }}>
           Viewing Experience
         </p>
-        <h1 className="mt-3 text-5xl font-semibold leading-tight">Cards own the page. Forms live on dedicated routes.</h1>
+        <h1 className="mt-3 text-5xl font-semibold leading-tight">Cards own the page. Editing slides in beside them.</h1>
         <p className="mt-4 text-lg" style={{ color: "var(--muted)" }}>
-          This matches the workflow you described more closely: the record list is card-first, full-width, and easy to scan, while edits happen on
-          a separate page such as <code>/books/BK-1001</code>.
+          The book list stays card-first and full-width, while create and edit now happen in a side panel that refreshes the collection when you
+          come back to the tab.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link className="rounded-full px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90" href="/books/new" style={createButtonStyle}>
+          <button
+            className="rounded-full px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            onClick={() => {
+              setSelectedRecord(undefined);
+              setPanelMode("create");
+            }}
+            style={createButtonStyle}
+            type="button"
+          >
             Create Book
-          </Link>
+          </button>
         </div>
       </section>
 
       <section className="space-y-6">
-        {initialBooks.map((record) => (
+        {books.map((record) => (
           <EntityCard
             key={record.bookId}
             sections={[
@@ -53,9 +80,16 @@ export const BooksLibraryPage = () => {
             ]}
             actions={
               <>
-                <Link className={cardActionClassName} href={`/books/${record.bookId}`}>
+                <button
+                  className={cardActionClassName}
+                  onClick={() => {
+                    setSelectedRecord(record);
+                    setPanelMode("edit");
+                  }}
+                  type="button"
+                >
                   Open Form
-                </Link>
+                </button>
                 <Link className={cardActionClassName} href={`/book-pages/${record.bookId}`}>
                   Open Pages
                 </Link>
@@ -66,6 +100,8 @@ export const BooksLibraryPage = () => {
           />
         ))}
       </section>
+
+      <BookFormPage isOpen={panelMode !== null} mode={panelMode ?? "create"} onClose={closePanel} record={selectedRecord} />
     </main>
   );
 };

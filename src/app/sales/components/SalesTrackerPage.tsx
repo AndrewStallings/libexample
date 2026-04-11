@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
+import { FormPopoutLink } from "@/app/components/FormPopoutLink";
 import { salesDemoStore, useSalesDemoStore } from "@/sales/services/salesDemoStore";
 import { transformSalesByBookView, transformSalesByReviewerView } from "@/sales/logic/transformers";
 
@@ -62,9 +63,9 @@ export const SalesTrackerPage = () => {
           cards without a second fetch.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90" href="/sales/new">
+          <FormPopoutLink className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90" href="/sales/new">
             Create Sale
-          </Link>
+          </FormPopoutLink>
           <button
             className="rounded-full border px-5 py-3 text-sm font-semibold"
             onClick={() => setViewMode((current) => (current === "book" ? "reviewer" : "book"))}
@@ -96,17 +97,17 @@ export const SalesTrackerPage = () => {
             actions={
               <>
                 {card.saleOptions.length === 1 ? (
-                  <Link className={cardActionClassName} href={`/sales/${card.saleOptions[0].saleId}`}>
+                  <FormPopoutLink className={cardActionClassName} href={`/sales/${card.saleOptions[0].saleId}`}>
                     Open Form
-                  </Link>
+                  </FormPopoutLink>
                 ) : (
                   <details className="rounded-xl border bg-white px-4 py-3">
                     <summary className="cursor-pointer text-sm font-semibold">Open Form</summary>
                     <div className="mt-3 flex flex-col gap-2">
                       {card.saleOptions.map((option) => (
-                        <Link className={cardActionClassName} href={`/sales/${option.saleId}`} key={option.saleId}>
+                        <FormPopoutLink className={cardActionClassName} href={`/sales/${option.saleId}`} key={option.saleId}>
                           {option.label}
-                        </Link>
+                        </FormPopoutLink>
                       ))}
                     </div>
                   </details>

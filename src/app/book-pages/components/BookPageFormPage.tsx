@@ -1,36 +1,40 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import { FormPageShell } from "our-lib";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { BookPageForm } from "@/book-pages/components/BookPageForm";
 import { createBookPageDemoService, toBookPageInput } from "@/book-pages/services/bookPageDemoService";
 import type { BookPageRecord } from "@/book-pages/models/schemas";
 import type { BookRecord } from "@/books/models/schemas";
+import { SidePanelShell } from "@/app/components/SidePanelShell";
+import { queryKeys } from "@/config/queryKeys";
 
 type BookPageFormPageProps = {
   mode: "create" | "edit";
   book: BookRecord;
   pageRecord?: BookPageRecord;
+  isOpen?: boolean;
+  onClose?: () => void;
 };
 
-export const BookPageFormPage = ({ mode, book, pageRecord }: BookPageFormPageProps) => {
-  const service = useMemo(() => createBookPageDemoService(), []);
+export const BookPageFormPage = ({ mode, book, pageRecord, isOpen = true, onClose }: BookPageFormPageProps) => {
+  const queryClient = useQueryClient();
+  const service = createBookPageDemoService();
   const [currentRecord, setCurrentRecord] = useState<BookPageRecord | undefined>(pageRecord);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    setCurrentRecord(pageRecord);
+    setStatusMessage(null);
+  }, [isOpen, mode, pageRecord]);
+
   return (
-    <FormPageShell
-      backHref={`/book-pages/${book.bookId}`}
-      backLabel={`Back to ${book.title} pages`}
-      title={mode === "create" ? `Create a page for ${book.title}` : `Edit ${currentRecord?.pageTitle ?? "book page"}`}
-      description="This child record flow stress-tests a parent-to-many-pages relationship while keeping the editing experience route-based."
+    <SidePanelShell
+      description="Child page editing now stays in a side panel so the dense page card list remains in view."
+      isOpen={isOpen}
+      onClose={onClose}
       statusMessage={statusMessage}
-      renderBackLink={({ href, className, children }) => (
-        <Link className={className} href={href}>
-          {children}
-        </Link>
-      )}
+      title={mode === "create" ? `Create a page for ${book.title}` : `Edit ${currentRecord?.pageTitle ?? "book page"}`}
     >
       <BookPageForm
         key={currentRecord?.pageId ?? `${book.bookId}-new-page`}
@@ -42,6 +46,8 @@ export const BookPageFormPage = ({ mode, book, pageRecord }: BookPageFormPagePro
             const created = await service.create(value, "demo-user");
             setCurrentRecord(created);
             setStatusMessage(`Created ${created.pageId} for ${book.title}.`);
+            await queryClient.invalidateQueries({ queryKey: queryKeys.bookPages(book.bookId) });
+            onClose?.();
             return;
           }
 
@@ -53,8 +59,10 @@ export const BookPageFormPage = ({ mode, book, pageRecord }: BookPageFormPagePro
           const updated = await service.update(currentRecord.pageId, value, "demo-user");
           setCurrentRecord(updated);
           setStatusMessage(`Saved changes for ${updated.pageId}.`);
+          await queryClient.invalidateQueries({ queryKey: queryKeys.bookPages(book.bookId) });
+          onClose?.();
         }}
       />
-    </FormPageShell>
+    </SidePanelShell>
   );
 };

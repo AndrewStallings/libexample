@@ -2,8 +2,32 @@ import { InMemoryBookPageRepository, initialBookPages } from "@/book-pages/data/
 import { createBookPageService } from "@/book-pages/services/bookPageService";
 import type { BookPageInput, BookPageRecord } from "@/book-pages/models/schemas";
 
+const createBookPageDemoStore = () => {
+  const repository = new InMemoryBookPageRepository();
+
+  return {
+    repository,
+    service: createBookPageService(repository),
+  };
+};
+
+let bookPageDemoStore = createBookPageDemoStore();
+
 export const createBookPageDemoService = () => {
-  return createBookPageService(new InMemoryBookPageRepository());
+  return bookPageDemoStore.service;
+};
+
+export const listBookPagesByBookId = async (bookId: string): Promise<BookPageRecord[]> => {
+  const result = await bookPageDemoStore.service.listByBookId(bookId);
+  return result.items;
+};
+
+export const getBookPageRecordById = async (pageId: string): Promise<BookPageRecord | undefined> => {
+  return (await bookPageDemoStore.service.getById(pageId)) ?? undefined;
+};
+
+export const resetBookPageDemoStore = () => {
+  bookPageDemoStore = createBookPageDemoStore();
 };
 
 export const getBookPageById = (pageId: string): BookPageRecord | undefined => {

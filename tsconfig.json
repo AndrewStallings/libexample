@@ -45,6 +45,12 @@
       "@/snacks/*": [
         "./src/app/snacks/*"
       ],
+      "@/config/*": [
+        "./src/config/*"
+      ],
+      "@/app/*": [
+        "./src/app/*"
+      ],
       "@/testing/*": [
         "./src/testing/*"
       ]

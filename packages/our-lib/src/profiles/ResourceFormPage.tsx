@@ -36,6 +36,7 @@ type ResourceFormPageProps<TService, TRecord, TInput extends Record<string, unkn
   getRecordId?: (record: TRecord) => import("../types/index").EntityId;
   createRecord: (service: TService, input: TInput) => Promise<TRecord>;
   updateRecord: (service: TService, record: TRecord, input: TInput) => Promise<TRecord>;
+  onSubmitted?: (record: TRecord, mode: "create" | "edit") => Promise<void> | void;
   resource?: Pick<ResourceBuilderResult<TRecord, TInput>, "profile" | "toInput" | "route" | "entityLabel" | "navigation">;
   profile?: ResourceProfile<TRecord, TInput>;
   toInput?: (record?: TRecord) => TInput;
@@ -53,6 +54,7 @@ export const ResourceFormPage = <TService, TRecord, TInput extends Record<string
   getRecordId,
   createRecord,
   updateRecord,
+  onSubmitted,
   resource,
   profile,
   toInput,
@@ -94,6 +96,7 @@ export const ResourceFormPage = <TService, TRecord, TInput extends Record<string
     initialRecord: record,
     createRecord: (input) => createRecord(service, input),
     updateRecord: (currentRecordValue, input) => updateRecord(service, currentRecordValue, input),
+    onSubmitted,
     getRecordId: requiredRecordId,
     entityLabel: resolvedEntityLabel,
   });

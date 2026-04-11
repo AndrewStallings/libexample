@@ -9,10 +9,12 @@ export default defineConfig({
     alias: {
       "@/book-pages": path.resolve(__dirname, "./src/app/book-pages"),
       "@/books": path.resolve(__dirname, "./src/app/books"),
+      "@/app": path.resolve(__dirname, "./src/app"),
       "@/drop-box-locations": path.resolve(__dirname, "./src/app/drop-box-locations"),
       "@/snacks": path.resolve(__dirname, "./src/app/snacks"),
       "@/reviews": path.resolve(__dirname, "./src/app/reviews"),
       "@/sales": path.resolve(__dirname, "./src/app/sales"),
+      "@/config": path.resolve(__dirname, "./src/config"),
       "@/testing": path.resolve(__dirname, "./src/testing"),
       "our-lib": path.resolve(__dirname, "./packages/our-lib/src/index.ts"),
     },
