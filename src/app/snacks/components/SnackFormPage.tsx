@@ -1,9 +1,7 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { FormShell, ResourceForm, useResourceFormState } from "our-lib";
-import { useEffect } from "react";
-import { queryKeys } from "@/config/queryKeys";
+import { FormShell, ResourceForm, useSidePanelFormState } from "our-lib";
+import { SNACKS_QUERY_KEY } from "@/snacks/components/SnacksLibraryPage";
 import { snackResource } from "@/snacks/models/resource";
 import type { SnackInput, SnackRecord } from "@/snacks/models/schemas";
 import { createSnackDemoService } from "@/snacks/services/snackDemoService";
@@ -16,25 +14,22 @@ type SnackFormPageProps = {
 };
 
 export const SnackFormPage = ({ mode, record, isOpen = true, onClose }: SnackFormPageProps) => {
-  const queryClient = useQueryClient();
-  const service = createSnackDemoService();
-  const { currentRecord, statusMessage, setCurrentRecord, setStatusMessage, handleSubmit } = useResourceFormState<SnackRecord, SnackInput>({
+  const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<
+    ReturnType<typeof createSnackDemoService>,
+    SnackRecord,
+    SnackInput
+  >({
     mode,
-    initialRecord: record,
-    createRecord: (input) => service.create(input, "demo-user"),
-    updateRecord: (currentRecordValue, input) => service.update(currentRecordValue.snackId, input, "demo-user"),
+    record,
+    isOpen,
+    onClose,
+    createService: createSnackDemoService,
+    queryKey: [SNACKS_QUERY_KEY],
+    createRecord: (service, input) => service.create(input, "demo-user"),
+    updateRecord: (service, currentRecordValue, input) => service.update(currentRecordValue.snackId, input, "demo-user"),
     getRecordId: (currentRecordValue) => currentRecordValue.snackId,
     entityLabel: "snack",
-    onSubmitted: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.snacks });
-      onClose?.();
-    },
   });
-
-  useEffect(() => {
-    setCurrentRecord(record);
-    setStatusMessage(null);
-  }, [isOpen, mode, record, setCurrentRecord, setStatusMessage]);
 
   return (
     <FormShell

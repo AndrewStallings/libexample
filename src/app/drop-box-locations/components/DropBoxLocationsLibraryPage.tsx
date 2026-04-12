@@ -7,13 +7,14 @@ import { dropBoxLocationProfile } from "@/drop-box-locations/models/profile";
 import { DropBoxLocationFormPage } from "@/drop-box-locations/components/DropBoxLocationFormPage";
 import type { DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
 import { listDropBoxLocations } from "@/drop-box-locations/services/dropBoxLocationDemoService";
-import { queryKeys } from "@/config/queryKeys";
+
+export const DROP_BOX_LOCATIONS_QUERY_KEY = "drop-box-locations";
 
 export const DropBoxLocationsLibraryPage = () => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<DropBoxLocationRecord | undefined>();
   const { data: locations = [] } = useQuery({
-    queryKey: queryKeys.dropBoxLocations,
+    queryKey: [DROP_BOX_LOCATIONS_QUERY_KEY],
     queryFn: listDropBoxLocations,
   });
 

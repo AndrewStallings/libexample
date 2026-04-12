@@ -1,12 +1,10 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { FormShell } from "our-lib";
+import { FormShell, useSidePanelFormState } from "our-lib";
 import { ReviewForm } from "@/reviews/components/ReviewForm";
+import { REVIEWS_QUERY_KEY } from "@/reviews/components/ReviewsLibraryPage";
 import { createReviewDemoService, toReviewInput } from "@/reviews/services/reviewDemoService";
 import type { ReviewRecord } from "@/reviews/models/schemas";
-import { queryKeys } from "@/config/queryKeys";
 
 type ReviewFormPageProps = {
   mode: "create" | "edit";
@@ -16,15 +14,22 @@ type ReviewFormPageProps = {
 };
 
 export const ReviewFormPage = ({ mode, record, isOpen = true, onClose }: ReviewFormPageProps) => {
-  const queryClient = useQueryClient();
-  const service = createReviewDemoService();
-  const [currentRecord, setCurrentRecord] = useState<ReviewRecord | undefined>(record);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    setCurrentRecord(record);
-    setStatusMessage(null);
-  }, [isOpen, mode, record]);
+  const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<
+    ReturnType<typeof createReviewDemoService>,
+    ReviewRecord,
+    ReturnType<typeof toReviewInput>
+  >({
+    mode,
+    record,
+    isOpen,
+    onClose,
+    createService: createReviewDemoService,
+    queryKey: [REVIEWS_QUERY_KEY],
+    createRecord: (service, input) => service.create(input, "demo-user"),
+    updateRecord: (service, currentRecordValue, input) => service.update(currentRecordValue.reviewId, input, "demo-user"),
+    getRecordId: (currentRecordValue) => currentRecordValue.reviewId,
+    entityLabel: "review",
+  });
 
   return (
     <FormShell
@@ -40,27 +45,7 @@ export const ReviewFormPage = ({ mode, record, isOpen = true, onClose }: ReviewF
         mode={mode}
         initialValue={toReviewInput(currentRecord)}
         record={currentRecord}
-        onSubmit={async (value) => {
-          if (mode === "create") {
-            const created = await service.create(value, "demo-user");
-            setCurrentRecord(created);
-            setStatusMessage(`Created ${created.reviewId}.`);
-            await queryClient.invalidateQueries({ queryKey: queryKeys.reviews });
-            onClose?.();
-            return;
-          }
-
-          if (!currentRecord) {
-            setStatusMessage("No review was available to update.");
-            return;
-          }
-
-          const updated = await service.update(currentRecord.reviewId, value, "demo-user");
-          setCurrentRecord(updated);
-          setStatusMessage(`Saved changes for ${updated.reviewId}.`);
-          await queryClient.invalidateQueries({ queryKey: queryKeys.reviews });
-          onClose?.();
-        }}
+        onSubmit={handleSubmit}
       />
     </FormShell>
   );

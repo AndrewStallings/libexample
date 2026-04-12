@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { BookPagesLibraryPage } from "@/book-pages/components/BookPagesLibraryPage";
+import { BOOKS_QUERY_KEY } from "@/books/components/BooksLibraryPage";
 import { listBooks } from "@/books/services/bookDemoService";
-import { queryKeys } from "@/config/queryKeys";
 
 type BookPagesRouteClientProps = {
   bookId: string;
@@ -12,7 +12,7 @@ type BookPagesRouteClientProps = {
 
 export const BookPagesRouteClient = ({ bookId }: BookPagesRouteClientProps) => {
   const { data: books = [] } = useQuery({
-    queryKey: queryKeys.books,
+    queryKey: [BOOKS_QUERY_KEY],
     queryFn: listBooks,
   });
   const book = books.find((record) => record.bookId === bookId);

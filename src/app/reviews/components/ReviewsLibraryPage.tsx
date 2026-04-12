@@ -7,7 +7,8 @@ import { ReviewFormPage } from "@/reviews/components/ReviewFormPage";
 import type { ReviewRecord } from "@/reviews/models/schemas";
 import { reviewTypes, reviewerOptions } from "@/reviews/models/lookupData";
 import { listReviews } from "@/reviews/services/reviewDemoService";
-import { queryKeys } from "@/config/queryKeys";
+
+export const REVIEWS_QUERY_KEY = "reviews";
 
 const getReviewTypeName = (reviewTypeId: string) => {
   return reviewTypes.find((item) => item.reviewTypeId === reviewTypeId)?.type ?? reviewTypeId;
@@ -25,7 +26,7 @@ export const ReviewsLibraryPage = () => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<ReviewRecord | undefined>();
   const { data: reviews = [] } = useQuery({
-    queryKey: queryKeys.reviews,
+    queryKey: [REVIEWS_QUERY_KEY],
     queryFn: listReviews,
   });
 

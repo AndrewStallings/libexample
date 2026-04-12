@@ -1,13 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { FormShell } from "our-lib";
+import { FormShell, useSidePanelFormState } from "our-lib";
 import { BookForm } from "@/books/components/BookForm";
+import { BOOKS_QUERY_KEY } from "@/books/components/BooksLibraryPage";
 import { createBookDemoService, toBookInput } from "@/books/services/bookDemoService";
 import type { BookRecord } from "@/books/models/schemas";
-import { queryKeys } from "@/config/queryKeys";
 
 type BookFormPageProps = {
   mode: "create" | "edit";
@@ -17,15 +15,17 @@ type BookFormPageProps = {
 };
 
 export const BookFormPage = ({ mode, record, isOpen = true, onClose }: BookFormPageProps) => {
-  const queryClient = useQueryClient();
-  const service = createBookDemoService();
-  const [currentRecord, setCurrentRecord] = useState<BookRecord | undefined>(record);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    setCurrentRecord(record);
-    setStatusMessage(null);
-  }, [isOpen, mode, record]);
+  const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<ReturnType<typeof createBookDemoService>, BookRecord, ReturnType<typeof toBookInput>>({
+    mode,
+    record,
+    isOpen,
+    onClose,
+    createService: createBookDemoService,
+    queryKey: [BOOKS_QUERY_KEY],
+    createRecord: (service, input) => service.create(input, "demo-user"),
+    updateRecord: (service, currentRecordValue, input) => service.update(currentRecordValue.bookId, input, "demo-user"),
+    getRecordId: (currentRecordValue) => currentRecordValue.bookId,
+  });
 
   return (
     <FormShell
@@ -48,27 +48,7 @@ export const BookFormPage = ({ mode, record, isOpen = true, onClose }: BookFormP
         mode={mode}
         initialValue={toBookInput(currentRecord)}
         record={currentRecord}
-        onSubmit={async (value) => {
-          if (mode === "create") {
-            const created = await service.create(value, "demo-user");
-            setCurrentRecord(created);
-            setStatusMessage(`Created ${created.bookId}.`);
-            await queryClient.invalidateQueries({ queryKey: queryKeys.books });
-            onClose?.();
-            return;
-          }
-
-          if (!currentRecord) {
-            setStatusMessage("No record was available to update.");
-            return;
-          }
-
-          const updated = await service.update(currentRecord.bookId, value, "demo-user");
-          setCurrentRecord(updated);
-          setStatusMessage(`Saved changes for ${updated.bookId}.`);
-          await queryClient.invalidateQueries({ queryKey: queryKeys.books });
-          onClose?.();
-        }}
+        onSubmit={handleSubmit}
       />
     </FormShell>
   );

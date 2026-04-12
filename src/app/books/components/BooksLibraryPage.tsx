@@ -7,7 +7,8 @@ import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
 import { BookFormPage } from "@/books/components/BookFormPage";
 import type { BookRecord } from "@/books/models/schemas";
 import { listBooks } from "@/books/services/bookDemoService";
-import { queryKeys } from "@/config/queryKeys";
+
+export const BOOKS_QUERY_KEY = "books";
 
 const formatStatus = (status: string) => {
   return status[0]?.toUpperCase() + status.slice(1);
@@ -17,7 +18,7 @@ export const BooksLibraryPage = () => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<BookRecord | undefined>();
   const { data: books = [] } = useQuery({
-    queryKey: queryKeys.books,
+    queryKey: [BOOKS_QUERY_KEY],
     queryFn: listBooks,
   });
 

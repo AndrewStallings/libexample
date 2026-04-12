@@ -7,13 +7,14 @@ import { SnackFormPage } from "@/snacks/components/SnackFormPage";
 import { snackResource } from "@/snacks/models/resource";
 import type { SnackRecord } from "@/snacks/models/schemas";
 import { listSnacks } from "@/snacks/services/snackDemoService";
-import { queryKeys } from "@/config/queryKeys";
+
+export const SNACKS_QUERY_KEY = "snacks";
 
 export const SnacksLibraryPage = () => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<SnackRecord | undefined>();
   const { data: snacks = [] } = useQuery({
-    queryKey: queryKeys.snacks,
+    queryKey: [SNACKS_QUERY_KEY],
     queryFn: listSnacks,
   });
 

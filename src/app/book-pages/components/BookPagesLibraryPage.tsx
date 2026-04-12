@@ -8,7 +8,9 @@ import { BookPageFormPage } from "@/book-pages/components/BookPageFormPage";
 import { listBookPagesByBookId } from "@/book-pages/services/bookPageDemoService";
 import type { BookPageRecord } from "@/book-pages/models/schemas";
 import type { BookRecord } from "@/books/models/schemas";
-import { queryKeys } from "@/config/queryKeys";
+
+export const BOOK_PAGES_QUERY_KEY = "book-pages";
+export const getBookPagesQueryKey = (bookId: string) => [BOOK_PAGES_QUERY_KEY, bookId] as const;
 
 type BookPagesLibraryPageProps = {
   book: BookRecord;
@@ -18,7 +20,7 @@ export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<BookPageRecord | undefined>();
   const { data: pageRecords = [] } = useQuery({
-    queryKey: queryKeys.bookPages(book.bookId),
+    queryKey: getBookPagesQueryKey(book.bookId),
     queryFn: () => listBookPagesByBookId(book.bookId),
   });
 
