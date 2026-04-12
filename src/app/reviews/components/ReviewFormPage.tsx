@@ -2,10 +2,10 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { FormShell } from "our-lib";
 import { ReviewForm } from "@/reviews/components/ReviewForm";
 import { createReviewDemoService, toReviewInput } from "@/reviews/services/reviewDemoService";
 import type { ReviewRecord } from "@/reviews/models/schemas";
-import { SidePanelShell } from "@/app/components/SidePanelShell";
 import { queryKeys } from "@/config/queryKeys";
 
 type ReviewFormPageProps = {
@@ -27,7 +27,8 @@ export const ReviewFormPage = ({ mode, record, isOpen = true, onClose }: ReviewF
   }, [isOpen, mode, record]);
 
   return (
-    <SidePanelShell
+    <FormShell
+      variant="side-panel"
       description="The review editor now lives in a side panel so we can keep the joined review cards visible while mutations refresh the list."
       isOpen={isOpen}
       onClose={onClose}
@@ -61,6 +62,6 @@ export const ReviewFormPage = ({ mode, record, isOpen = true, onClose }: ReviewF
           onClose?.();
         }}
       />
-    </SidePanelShell>
+    </FormShell>
   );
 };

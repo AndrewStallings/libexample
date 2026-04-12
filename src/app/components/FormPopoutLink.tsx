@@ -1,21 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
 import type { CSSProperties } from "react";
 import type { ReactNode } from "react";
 
 type FormPopoutLinkProps = {
   href: string;
+  returnTo?: string;
   className?: string;
   children: ReactNode;
   style?: CSSProperties;
 };
 
-export const FormPopoutLink = ({ href, className, children, style }: FormPopoutLinkProps) => {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const returnTo = pathname ? `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ""}` : undefined;
+export const FormPopoutLink = ({ href, returnTo, className, children, style }: FormPopoutLinkProps) => {
   const nextHref = returnTo ? `${href}${href.includes("?") ? "&" : "?"}returnTo=${encodeURIComponent(returnTo)}` : href;
 
   return (

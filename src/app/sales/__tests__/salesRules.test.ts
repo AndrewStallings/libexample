@@ -17,7 +17,18 @@ const baseSale = {
 describe("salesRules", () => {
   it("clears hidden values when switching to online", () => {
     const normalized = normalizeSaleInputForType(baseSale);
-    expect(normalized.storeLocation).toBe("Amazon");
+    expect(normalized.storeLocation).toBe("");
+  });
+
+  it("clears online-only values when switching to in-store", () => {
+    const normalized = normalizeSaleInputForType({
+      ...baseSale,
+      saleType: "instore",
+      storeLocation: "Downtown",
+    });
+
+    expect(normalized.marketplace).toBe("");
+    expect(normalized.orderId).toBe("");
   });
 
   it("returns correct field visibility", () => {

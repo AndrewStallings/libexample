@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { FormShell } from "our-lib";
 import { BookForm } from "@/books/components/BookForm";
 import { createBookDemoService, toBookInput } from "@/books/services/bookDemoService";
 import type { BookRecord } from "@/books/models/schemas";
-import { SidePanelShell } from "@/app/components/SidePanelShell";
 import { queryKeys } from "@/config/queryKeys";
 
 type BookFormPageProps = {
@@ -28,7 +28,8 @@ export const BookFormPage = ({ mode, record, isOpen = true, onClose }: BookFormP
   }, [isOpen, mode, record]);
 
   return (
-    <SidePanelShell
+    <FormShell
+      variant="side-panel"
       description="Books now edit in a side panel so the card view stays visible while we save and refresh the collection behind it."
       isOpen={isOpen}
       onClose={onClose}
@@ -69,6 +70,6 @@ export const BookFormPage = ({ mode, record, isOpen = true, onClose }: BookFormP
           onClose?.();
         }}
       />
-    </SidePanelShell>
+    </FormShell>
   );
 };

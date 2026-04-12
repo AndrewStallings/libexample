@@ -2,11 +2,11 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { FormShell } from "our-lib";
 import { BookPageForm } from "@/book-pages/components/BookPageForm";
 import { createBookPageDemoService, toBookPageInput } from "@/book-pages/services/bookPageDemoService";
 import type { BookPageRecord } from "@/book-pages/models/schemas";
 import type { BookRecord } from "@/books/models/schemas";
-import { SidePanelShell } from "@/app/components/SidePanelShell";
 import { queryKeys } from "@/config/queryKeys";
 
 type BookPageFormPageProps = {
@@ -29,7 +29,8 @@ export const BookPageFormPage = ({ mode, book, pageRecord, isOpen = true, onClos
   }, [isOpen, mode, pageRecord]);
 
   return (
-    <SidePanelShell
+    <FormShell
+      variant="side-panel"
       description="Child page editing now stays in a side panel so the dense page card list remains in view."
       isOpen={isOpen}
       onClose={onClose}
@@ -63,6 +64,6 @@ export const BookPageFormPage = ({ mode, book, pageRecord, isOpen = true, onClos
           onClose?.();
         }}
       />
-    </SidePanelShell>
+    </FormShell>
   );
 };

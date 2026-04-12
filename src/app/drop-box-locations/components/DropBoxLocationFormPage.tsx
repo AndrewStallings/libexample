@@ -1,9 +1,8 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { ResourceForm, useResourceFormState } from "our-lib";
+import { FormShell, ResourceForm, useResourceFormState } from "our-lib";
 import { useEffect } from "react";
-import { SidePanelShell } from "@/app/components/SidePanelShell";
 import { queryKeys } from "@/config/queryKeys";
 import { createDropBoxLocationDemoService, toDropBoxLocationInput } from "@/drop-box-locations/services/dropBoxLocationDemoService";
 import { dropBoxLocationProfile } from "@/drop-box-locations/models/profile";
@@ -41,7 +40,8 @@ export const DropBoxLocationFormPage = ({ mode, record, isOpen = true, onClose }
   }, [isOpen, mode, record, setCurrentRecord, setStatusMessage]);
 
   return (
-    <SidePanelShell
+    <FormShell
+      variant="side-panel"
       description="Generated location forms now stay beside the card list and refresh through TanStack Query when you save."
       isOpen={isOpen}
       onClose={onClose}
@@ -56,6 +56,6 @@ export const DropBoxLocationFormPage = ({ mode, record, isOpen = true, onClose }
         profile={dropBoxLocationProfile}
         record={currentRecord}
       />
-    </SidePanelShell>
+    </FormShell>
   );
 };

@@ -1,9 +1,8 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { ResourceForm, useResourceFormState } from "our-lib";
+import { FormShell, ResourceForm, useResourceFormState } from "our-lib";
 import { useEffect } from "react";
-import { SidePanelShell } from "@/app/components/SidePanelShell";
 import { queryKeys } from "@/config/queryKeys";
 import { snackResource } from "@/snacks/models/resource";
 import type { SnackInput, SnackRecord } from "@/snacks/models/schemas";
@@ -38,7 +37,8 @@ export const SnackFormPage = ({ mode, record, isOpen = true, onClose }: SnackFor
   }, [isOpen, mode, record, setCurrentRecord, setStatusMessage]);
 
   return (
-    <SidePanelShell
+    <FormShell
+      variant="side-panel"
       description="This resource-driven form now slides in beside the snack cards and refreshes the collection through query invalidation."
       isOpen={isOpen}
       onClose={onClose}
@@ -53,6 +53,6 @@ export const SnackFormPage = ({ mode, record, isOpen = true, onClose }: SnackFor
         profile={snackResource.profile}
         record={currentRecord}
       />
-    </SidePanelShell>
+    </FormShell>
   );
 };

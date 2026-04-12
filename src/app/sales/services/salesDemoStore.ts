@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { canViewSalesTracker } from "@/sales/logic/rules";
-import { InMemorySalesRepository } from "@/sales/data/salesRepository";
+import { InMemorySalesRepository, initialSales } from "@/sales/data/salesRepository";
 import type { SaleInput, SaleRecord, SaleRevision, SalesUser } from "@/sales/models/schemas";
 import { createSalesService } from "@/sales/services/salesService";
 import { createAppAuditLogger } from "@/config/auditLogger";
@@ -23,7 +23,7 @@ type SalesDemoState = {
 };
 
 let state: SalesDemoState = {
-  sales: [],
+  sales: initialSales,
   currentUser,
 };
 

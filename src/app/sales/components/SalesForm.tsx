@@ -62,7 +62,7 @@ export const SalesForm = ({ mode, initialValue, record, onSubmit, onImportObject
       return;
     }
 
-    form.setFieldValue("storeLocation", "Amazon");
+    form.setFieldValue("storeLocation", "");
   }, [form, saleType]);
 
   return (

@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { ReactNode } from "react";
-import { FormPageShell } from "../forms/index";
+import { FormShell } from "../forms/index";
 import type { ResourceBuilderResult } from "./createResourceBuilder";
 import type { ResourceProfile } from "./defineResourceProfile";
 import { ResourceForm } from "./ResourceForm";
@@ -102,7 +102,8 @@ export const ResourceFormPage = <TService, TRecord, TInput extends Record<string
   });
 
   return (
-    <FormPageShell
+    <FormShell
+      variant="page"
       backHref={resolvedBackHref}
       backLabel={resolvedBackLabel}
       title={resolvedProfile.getFormTitle(mode, currentRecord)}
@@ -117,6 +118,6 @@ export const ResourceFormPage = <TService, TRecord, TInput extends Record<string
         profile={resolvedProfile}
         record={currentRecord}
       />
-    </FormPageShell>
+    </FormShell>
   );
 };

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { FormPageShell } from "our-lib";
+import { FormShell } from "our-lib";
 import { SalesForm } from "@/sales/components/SalesForm";
 import { salesDemoStore, useSalesDemoStore } from "@/sales/services/salesDemoStore";
 import type { SaleInput, SaleRecord, SaleRevision } from "@/sales/models/schemas";
@@ -97,7 +97,8 @@ export const SalesFormPage = ({ mode, saleId }: SalesFormPageProps) => {
   }, [saleId, sales]);
 
   return (
-    <FormPageShell
+    <FormShell
+      variant="page"
       backHref="/sales"
       backLabel="Back to sales cards"
       title={
@@ -242,6 +243,6 @@ export const SalesFormPage = ({ mode, saleId }: SalesFormPageProps) => {
           </div>
         </section>
       ) : null}
-    </FormPageShell>
+    </FormShell>
   );
 };

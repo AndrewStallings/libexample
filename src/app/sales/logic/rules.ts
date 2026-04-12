@@ -14,7 +14,7 @@ export const normalizeSaleInputForType = (input: SaleInput): SaleInput => {
 
   return {
     ...input,
-    storeLocation: "Amazon",
+    storeLocation: "",
   };
 };
 

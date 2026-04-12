@@ -73,6 +73,8 @@ export const initialSaleRows: SaleRow[] = [
   { saleId: "SL-3010", bookId: "sb-02", reviewerId: "rv-04", channelId: "ch-02", saleType: "instore", quantity: 7, totalAmount: 209.93, saleDate: "2026-03-10", storeLocation: "Downtown", createdBy: "Sally", createdAt: "2026-03-10T19:00:00.000Z", updatedBy: "Sally", updatedAt: "2026-03-10T19:00:00.000Z" },
 ];
 
+export const initialSales: SaleRecord[] = initialSaleRows.map((row) => joinSaleRecord(row, reviewerSeed));
+
 export type SalesRepository = {
   listSales(): Promise<SaleRecord[]>;
   getSaleById(id: EntityId): Promise<SaleRecord | null>;
