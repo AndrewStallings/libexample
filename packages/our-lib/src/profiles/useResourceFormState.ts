@@ -5,7 +5,7 @@ import type { EntityId } from "../types/index";
 
 type ResourceFormMode = "create" | "edit";
 
-type UseResourceFormStateOptions<TRecord, TInput> = {
+export type UseResourceFormStateOptions<TRecord, TInput> = {
   mode: ResourceFormMode;
   initialRecord?: TRecord;
   createRecord: (input: TInput) => Promise<TRecord>;

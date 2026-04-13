@@ -1,10 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import { FormShell, ResourceForm, useSidePanelFormState } from "our-lib";
-import { createDropBoxLocationDemoService, toDropBoxLocationInput } from "@/drop-box-locations/services/dropBoxLocationDemoService";
 import { DROP_BOX_LOCATIONS_QUERY_KEY } from "@/drop-box-locations/components/DropBoxLocationsLibraryPage";
+import { toDropBoxLocationInput } from "@/drop-box-locations/data/dropBoxLocationRepository";
 import { dropBoxLocationProfile } from "@/drop-box-locations/models/profile";
 import type { DropBoxLocationInput, DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
+import { createDropBoxLocationService } from "@/drop-box-locations/services/dropBoxLocationService";
 
 type DropBoxLocationFormPageProps = {
   mode: "create" | "edit";
@@ -14,8 +16,9 @@ type DropBoxLocationFormPageProps = {
 };
 
 export const DropBoxLocationFormPage = ({ mode, record, isOpen = true, onClose }: DropBoxLocationFormPageProps) => {
+  const service = useMemo(() => createDropBoxLocationService(), []);
   const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<
-    ReturnType<typeof createDropBoxLocationDemoService>,
+    ReturnType<typeof createDropBoxLocationService>,
     DropBoxLocationRecord,
     DropBoxLocationInput
   >({
@@ -23,10 +26,10 @@ export const DropBoxLocationFormPage = ({ mode, record, isOpen = true, onClose }
     record,
     isOpen,
     onClose,
-    createService: createDropBoxLocationDemoService,
+    createService: () => service,
     queryKey: [DROP_BOX_LOCATIONS_QUERY_KEY],
-    createRecord: (service, input) => service.create(input, "demo-user"),
-    updateRecord: (service, currentRecordValue, input) => service.update(currentRecordValue.locationId, input, "demo-user"),
+    createRecord: (serviceValue, input) => serviceValue.repository.create(input),
+    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.repository.update(currentRecordValue.locationId, input),
     getRecordId: (currentRecordValue) => currentRecordValue.locationId,
     entityLabel: "location",
   });

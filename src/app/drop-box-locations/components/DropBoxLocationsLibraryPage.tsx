@@ -1,21 +1,22 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ResourceCard, cardActionClassName } from "our-lib";
 import { dropBoxLocationProfile } from "@/drop-box-locations/models/profile";
 import { DropBoxLocationFormPage } from "@/drop-box-locations/components/DropBoxLocationFormPage";
 import type { DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
-import { listDropBoxLocations } from "@/drop-box-locations/services/dropBoxLocationDemoService";
+import { createDropBoxLocationService } from "@/drop-box-locations/services/dropBoxLocationService";
 
 export const DROP_BOX_LOCATIONS_QUERY_KEY = "drop-box-locations";
 
 export const DropBoxLocationsLibraryPage = () => {
+  const service = useMemo(() => createDropBoxLocationService(), []);
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<DropBoxLocationRecord | undefined>();
   const { data: locations = [] } = useQuery({
     queryKey: [DROP_BOX_LOCATIONS_QUERY_KEY],
-    queryFn: listDropBoxLocations,
+    queryFn: async () => (await service.repository.list()).items,
   });
 
   const closePanel = () => {

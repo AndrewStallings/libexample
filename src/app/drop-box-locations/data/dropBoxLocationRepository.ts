@@ -1,5 +1,5 @@
 import type { EntityId, ListResult, RecordRepository } from "our-lib";
-import type { DropBoxLocationInput, DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
+import { dropBoxLocationInputSchema, type DropBoxLocationInput, type DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
 
 export const initialDropBoxLocations: DropBoxLocationRecord[] = [
   {
@@ -55,17 +55,20 @@ export class InMemoryDropBoxLocationRepository implements RecordRepository<DropB
   };
 
   create = async (input: DropBoxLocationInput): Promise<DropBoxLocationRecord> => {
+    const validated = dropBoxLocationInputSchema.parse(input);
+
     const created: DropBoxLocationRecord = {
       locationId: `DB-${7000 + this.items.length + 1}`,
-      ...input,
+      ...validated,
       updatedAt: new Date().toISOString(),
-      updatedBy: input.districtManager,
+      updatedBy: validated.districtManager,
     };
     this.items.unshift(created);
     return created;
   };
 
   update = async (id: EntityId, input: DropBoxLocationInput): Promise<DropBoxLocationRecord> => {
+    const validated = dropBoxLocationInputSchema.parse(input);
     const existing = this.items.find((item) => item.locationId === id);
     if (!existing) {
       throw new Error(`Drop box location ${id} was not found`);
@@ -73,12 +76,56 @@ export class InMemoryDropBoxLocationRepository implements RecordRepository<DropB
 
     const updated: DropBoxLocationRecord = {
       ...existing,
-      ...input,
+      ...validated,
       updatedAt: new Date().toISOString(),
-      updatedBy: input.districtManager,
+      updatedBy: validated.districtManager,
     };
 
     this.items = this.items.map((item) => (item.locationId === id ? updated : item));
     return updated;
   };
 }
+
+export class ProductionDropBoxLocationRepository implements RecordRepository<
+  DropBoxLocationRecord,
+  DropBoxLocationInput,
+  DropBoxLocationInput
+> {
+  list = async (): Promise<ListResult<DropBoxLocationRecord>> => {
+    throw new Error("Production drop box location repository is not implemented yet.");
+  };
+
+  getById = async (_id: EntityId): Promise<DropBoxLocationRecord | null> => {
+    throw new Error("Production drop box location repository is not implemented yet.");
+  };
+
+  create = async (_input: DropBoxLocationInput): Promise<DropBoxLocationRecord> => {
+    throw new Error("Production drop box location repository is not implemented yet.");
+  };
+
+  update = async (_id: EntityId, _input: DropBoxLocationInput): Promise<DropBoxLocationRecord> => {
+    throw new Error("Production drop box location repository is not implemented yet.");
+  };
+}
+
+export const getDropBoxLocationById = (locationId: string): DropBoxLocationRecord | undefined => {
+  return initialDropBoxLocations.find((record) => record.locationId === locationId);
+};
+
+export const toDropBoxLocationInput = (record?: DropBoxLocationRecord): DropBoxLocationInput => {
+  return {
+    locationName: record?.locationName ?? "",
+    campus: record?.campus ?? "",
+    building: record?.building ?? "",
+    zone: record?.zone ?? "",
+    serviceLevel: record?.serviceLevel ?? "daily",
+    pickupWindow: record?.pickupWindow ?? "",
+    capacity: record?.capacity ?? 0,
+    currentLoad: record?.currentLoad ?? 0,
+    status: record?.status ?? "active",
+    accessCode: record?.accessCode ?? "",
+    districtManager: record?.districtManager ?? "",
+    climateZone: record?.climateZone ?? "",
+    notes: record?.notes ?? "",
+  };
+};

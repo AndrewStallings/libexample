@@ -93,30 +93,30 @@ export const ResourceFormPage = <TService, TRecord, TInput extends Record<string
 
   const { currentRecord, statusMessage, handleSubmit } = useResourceFormState<TRecord, TInput>({
     mode,
-    initialRecord: record,
     createRecord: (input) => createRecord(service, input),
     updateRecord: (currentRecordValue, input) => updateRecord(service, currentRecordValue, input),
-    onSubmitted,
     getRecordId: requiredRecordId,
-    entityLabel: resolvedEntityLabel,
+    ...(record !== undefined ? { initialRecord: record } : {}),
+    ...(onSubmitted !== undefined ? { onSubmitted } : {}),
+    ...(resolvedEntityLabel !== undefined ? { entityLabel: resolvedEntityLabel } : {}),
   });
 
   return (
     <FormShell
       variant="page"
-      backHref={resolvedBackHref}
-      backLabel={resolvedBackLabel}
       title={resolvedProfile.getFormTitle(mode, currentRecord)}
       description={description}
       statusMessage={statusMessage}
-      renderBackLink={renderBackLink}
+      {...(resolvedBackHref !== undefined ? { backHref: resolvedBackHref } : {})}
+      {...(resolvedBackLabel !== undefined ? { backLabel: resolvedBackLabel } : {})}
+      {...(renderBackLink !== undefined ? { renderBackLink } : {})}
     >
       <ResourceForm
         initialValue={resolvedToInput(currentRecord)}
         mode={mode}
         onSubmit={handleSubmit}
         profile={resolvedProfile}
-        record={currentRecord}
+        {...(currentRecord !== undefined ? { record: currentRecord } : {})}
       />
     </FormShell>
   );

@@ -58,6 +58,17 @@ export const ResourceForm = <TRecord, TInput extends Record<string, unknown>>({
   onSubmit,
 }: ResourceFormProps<TRecord, TInput>) => {
   const [localSubmitError, setLocalSubmitError] = useState<string | null>(null);
+  const formFrameProps = {
+    title: profile.getFormTitle(mode, record),
+    footer: (
+      <button className="rounded-full bg-teal-700 px-5 py-2 font-semibold text-white transition hover:opacity-90" type="submit">
+        {profile.getSubmitLabel(mode)}
+      </button>
+    ),
+    ...(record && profile.getRecordId ? { recordId: profile.getRecordId(record) } : {}),
+    ...(record && profile.getUpdatedAt ? { updatedAt: profile.getUpdatedAt(record) } : {}),
+    ...(record && profile.getUpdatedBy ? { updatedBy: profile.getUpdatedBy(record) } : {}),
+  };
   const form = useForm({
     defaultValues: initialValue,
     onSubmit: async ({ value }) => {
@@ -80,17 +91,7 @@ export const ResourceForm = <TRecord, TInput extends Record<string, unknown>>({
         void form.handleSubmit();
       }}
     >
-      <FormFrame
-        title={profile.getFormTitle(mode, record)}
-        recordId={record && profile.getRecordId ? profile.getRecordId(record) : undefined}
-        updatedAt={record && profile.getUpdatedAt ? profile.getUpdatedAt(record) : undefined}
-        updatedBy={record && profile.getUpdatedBy ? profile.getUpdatedBy(record) : undefined}
-        footer={
-          <button className="rounded-full bg-teal-700 px-5 py-2 font-semibold text-white transition hover:opacity-90" type="submit">
-            {profile.getSubmitLabel(mode)}
-          </button>
-        }
-      >
+      <FormFrame {...formFrameProps}>
         {profile.formFields.map((fieldDefinition) => (
           <div key={fieldDefinition.key} className={fieldDefinition.colSpan === 2 ? "md:col-span-2" : undefined}>
             <form.Field name={fieldDefinition.key as never}>
