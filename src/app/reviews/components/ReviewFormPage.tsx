@@ -8,9 +8,9 @@ import type { ReviewRecord } from "@/reviews/models/schemas";
 
 type ReviewFormPageProps = {
   mode: "create" | "edit";
-  record?: ReviewRecord;
-  isOpen?: boolean;
-  onClose?: () => void;
+  record?: ReviewRecord | undefined;
+  isOpen?: boolean | undefined;
+  onClose?: (() => void) | undefined;
 };
 
 export const ReviewFormPage = ({ mode, record, isOpen = true, onClose }: ReviewFormPageProps) => {

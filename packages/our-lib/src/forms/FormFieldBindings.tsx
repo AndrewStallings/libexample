@@ -18,10 +18,10 @@ const getErrorMessage = (value: unknown, fallback?: string) => {
 type FormTextFieldProps<TValue extends string | number | undefined> = {
   field: BoundField<TValue>;
   label: string;
-  description?: string;
-  error?: string;
-  disabled?: boolean;
-  parseValue?: (value: string) => TValue;
+  description?: string | undefined;
+  error?: string | undefined;
+  disabled?: boolean | undefined;
+  parseValue?: ((value: string) => TValue) | undefined;
 };
 
 export const FormTextField = <TValue extends string | number | undefined>({
@@ -53,12 +53,12 @@ type SelectOption = {
 type FormSelectFieldProps<TValue extends string | number> = {
   field: BoundField<TValue>;
   label: string;
-  description?: string;
-  error?: string;
+  description?: string | undefined;
+  error?: string | undefined;
   options: SelectOption[];
-  parseValue?: (value: string) => TValue;
-  onValueChange?: (value: TValue) => void;
-  disabled?: boolean;
+  parseValue?: ((value: string) => TValue) | undefined;
+  onValueChange?: ((value: TValue) => void) | undefined;
+  disabled?: boolean | undefined;
 };
 
 export const FormSelectField = <TValue extends string | number>({
@@ -91,9 +91,9 @@ export const FormSelectField = <TValue extends string | number>({
 type FormTextAreaFieldProps = {
   field: BoundField<string | undefined>;
   label: string;
-  description?: string;
-  error?: string;
-  disabled?: boolean;
+  description?: string | undefined;
+  error?: string | undefined;
+  disabled?: boolean | undefined;
 };
 
 export const FormTextAreaField = ({ field, label, description, error, disabled }: FormTextAreaFieldProps) => {
@@ -113,14 +113,14 @@ export const FormTextAreaField = ({ field, label, description, error, disabled }
 type FormAsyncComboboxFieldProps = {
   field: BoundField<string>;
   label: string;
-  description?: string;
-  error?: string;
-  disabled?: boolean;
-  displayValue?: string;
+  description?: string | undefined;
+  error?: string | undefined;
+  disabled?: boolean | undefined;
+  displayValue?: string | undefined;
   loadOptions: (query: string) => Promise<AsyncComboboxOption[]>;
-  onOptionSelected?: (option: AsyncComboboxOption) => void;
-  emptyMessage?: string;
-  placeholder?: string;
+  onOptionSelected?: ((option: AsyncComboboxOption) => void) | undefined;
+  emptyMessage?: string | undefined;
+  placeholder?: string | undefined;
 };
 
 export const FormAsyncComboboxField = ({

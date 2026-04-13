@@ -7,19 +7,19 @@ type ResourceFormMode = "create" | "edit";
 
 export type UseResourceFormStateOptions<TRecord, TInput> = {
   mode: ResourceFormMode;
-  initialRecord?: TRecord;
+  initialRecord?: TRecord | undefined;
   createRecord: (input: TInput) => Promise<TRecord>;
   updateRecord: (record: TRecord, input: TInput) => Promise<TRecord>;
-  onSubmitted?: (record: TRecord, mode: ResourceFormMode) => Promise<void> | void;
+  onSubmitted?: ((record: TRecord, mode: ResourceFormMode) => Promise<void> | void) | undefined;
   getRecordId: (record: TRecord) => EntityId;
-  entityLabel?: string;
-  getCreatedMessage?: (record: TRecord) => string;
-  getUpdatedMessage?: (record: TRecord) => string;
-  getMissingRecordMessage?: () => string;
+  entityLabel?: string | undefined;
+  getCreatedMessage?: ((record: TRecord) => string) | undefined;
+  getUpdatedMessage?: ((record: TRecord) => string) | undefined;
+  getMissingRecordMessage?: (() => string) | undefined;
 };
 
 type UseResourceFormStateResult<TRecord, TInput> = {
-  currentRecord?: TRecord;
+  currentRecord?: TRecord | undefined;
   statusMessage: string | null;
   setCurrentRecord: (record: TRecord | undefined) => void;
   setStatusMessage: (message: string | null) => void;

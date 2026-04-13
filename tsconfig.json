@@ -17,12 +17,13 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
       "our-lib": [
         "./packages/our-lib/src/index.ts"

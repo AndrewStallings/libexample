@@ -6,15 +6,15 @@ import type { EntityId, SelectOption, UpdatedAtValue } from "../types/index";
 export type ResourceCardField<TRecord> = {
   label: string;
   section: string;
-  prominent?: boolean;
+  prominent?: boolean | undefined;
   value: (record: TRecord) => ReactNode;
 };
 
 type ResourceFormFieldBase<TInput, TKey extends keyof TInput & string> = {
   key: TKey;
   label: string;
-  description?: string;
-  colSpan?: 1 | 2;
+  description?: string | undefined;
+  colSpan?: 1 | 2 | undefined;
 };
 
 export type ResourceTextField<TInput, TKey extends keyof TInput & string> = ResourceFormFieldBase<TInput, TKey> & {
@@ -33,7 +33,7 @@ export type ResourceSelectField<TInput, TKey extends keyof TInput & string> = Re
 export type ResourceAsyncComboboxField<TInput, TKey extends keyof TInput & string> = ResourceFormFieldBase<TInput, TKey> & {
   kind: "async-combobox";
   loadOptions: (query: string) => Promise<AsyncComboboxOption[]>;
-  placeholder?: string;
+  placeholder?: string | undefined;
 };
 
 export type ResourceFormField<TInput> =
@@ -45,10 +45,10 @@ export type ResourceFormField<TInput> =
 export type ResourceProfile<TRecord, TInput extends Record<string, unknown>> = {
   entityName: string;
   inputSchema: ZodType<TInput>;
-  getRecordId?: (record: TRecord) => EntityId | undefined;
-  getUpdatedAt?: (record: TRecord) => UpdatedAtValue | undefined;
-  getUpdatedBy?: (record: TRecord) => string | undefined;
-  getFormTitle: (mode: "create" | "edit", record?: TRecord) => string;
+  getRecordId?: ((record: TRecord) => EntityId | undefined) | undefined;
+  getUpdatedAt?: ((record: TRecord) => UpdatedAtValue | undefined) | undefined;
+  getUpdatedBy?: ((record: TRecord) => string | undefined) | undefined;
+  getFormTitle: (mode: "create" | "edit", record?: TRecord | undefined) => string;
   getSubmitLabel: (mode: "create" | "edit") => string;
   cardFields: ResourceCardField<TRecord>[];
   formFields: ResourceFormField<TInput>[];

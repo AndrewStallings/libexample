@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode, 
 
 type FieldShellProps = {
   label: string;
-  description?: string;
-  error?: string;
+  description?: string | undefined;
+  error?: string | undefined;
   children: ReactNode;
 };
 
@@ -35,8 +35,8 @@ const FieldShell = ({ label, description, error, children }: FieldShellProps) =>
 
 type TextInputProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
-  description?: string;
-  error?: string;
+  description?: string | undefined;
+  error?: string | undefined;
 };
 
 export const TextInput = ({ label, description, error, ...props }: TextInputProps) => {
@@ -53,8 +53,8 @@ export const TextInput = ({ label, description, error, ...props }: TextInputProp
 
 type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label: string;
-  description?: string;
-  error?: string;
+  description?: string | undefined;
+  error?: string | undefined;
 };
 
 export const TextArea = ({ label, description, error, ...props }: TextAreaProps) => {
@@ -71,8 +71,8 @@ export const TextArea = ({ label, description, error, ...props }: TextAreaProps)
 
 type SelectInputProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
-  description?: string;
-  error?: string;
+  description?: string | undefined;
+  error?: string | undefined;
   options: Array<{ label: string; value: string }>;
 };
 
@@ -97,18 +97,18 @@ export const SelectInput = ({ label, description, error, options, ...props }: Se
 export type AsyncComboboxOption = {
   label: string;
   value: string;
-  description?: string;
+  description?: string | undefined;
 };
 
 type AsyncComboboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> & {
   label: string;
-  description?: string;
-  error?: string;
+  description?: string | undefined;
+  error?: string | undefined;
   value: string;
-  displayValue?: string;
+  displayValue?: string | undefined;
   loadOptions: (query: string) => Promise<AsyncComboboxOption[]>;
   onOptionSelect: (option: AsyncComboboxOption) => void;
-  emptyMessage?: string;
+  emptyMessage?: string | undefined;
 };
 
 export const AsyncCombobox = ({

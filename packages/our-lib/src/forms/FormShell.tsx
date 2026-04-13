@@ -10,15 +10,15 @@ type LinkRenderProps = {
 };
 
 export type FormShellProps = {
-  variant?: "page" | "side-panel";
-  isOpen?: boolean;
-  backHref?: string;
-  backLabel?: string;
+  variant?: "page" | "side-panel" | undefined;
+  isOpen?: boolean | undefined;
+  backHref?: string | undefined;
+  backLabel?: string | undefined;
   title: string;
   description: string;
-  statusMessage?: string | null;
-  onClose?: () => void;
-  renderBackLink?: (props: LinkRenderProps) => ReactNode;
+  statusMessage?: string | null | undefined;
+  onClose?: (() => void) | undefined;
+  renderBackLink?: ((props: LinkRenderProps) => ReactNode) | undefined;
   children: ReactNode;
 };
 

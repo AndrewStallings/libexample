@@ -9,7 +9,7 @@ import { reviewInputSchema, reviewRatingOptions, reviewStatusOptions, type Revie
 type ReviewFormProps = {
   mode: "create" | "edit";
   initialValue: ReviewInput;
-  record?: ReviewRecord;
+  record?: ReviewRecord | undefined;
   onSubmit: (value: ReviewInput) => Promise<void>;
 };
 

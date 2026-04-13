@@ -11,9 +11,9 @@ type SaleRow = {
   quantity: number;
   totalAmount: number;
   saleDate: string;
-  storeLocation?: string;
-  marketplace?: string;
-  orderId?: string;
+  storeLocation?: string | undefined;
+  marketplace?: string | undefined;
+  orderId?: string | undefined;
   createdBy: string;
   createdAt: string;
   updatedBy: string;
@@ -80,7 +80,7 @@ export type SalesRepository = {
   getSaleById(id: EntityId): Promise<SaleRecord | null>;
   createSale(input: SaleInput, userName: string): Promise<SaleRecord>;
   updateSale(id: EntityId, input: SaleInput, userName: string): Promise<SaleRecord>;
-  deleteSale(id: EntityId, reason: string, userName: string): Promise<{ deletedSaleId: string; deletedReviewerId?: string }>;
+  deleteSale(id: EntityId, reason: string, userName: string): Promise<{ deletedSaleId: string; deletedReviewerId?: string | undefined }>;
   listRevisions(saleId: EntityId): Promise<SaleRevision[]>;
   restoreRevision(saleId: EntityId, revisionId: string, userName: string): Promise<SaleRecord>;
   importSales(inputs: SaleInput[], userName: string): Promise<SaleRecord[]>;

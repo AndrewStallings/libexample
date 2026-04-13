@@ -13,7 +13,10 @@
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "esModuleInterop": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true
+
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/__tests__/**"]

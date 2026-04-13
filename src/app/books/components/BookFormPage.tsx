@@ -9,9 +9,9 @@ import type { BookRecord } from "@/books/models/schemas";
 
 type BookFormPageProps = {
   mode: "create" | "edit";
-  record?: BookRecord;
-  isOpen?: boolean;
-  onClose?: () => void;
+  record?: BookRecord | undefined;
+  isOpen?: boolean | undefined;
+  onClose?: (() => void) | undefined;
 };
 
 export const BookFormPage = ({ mode, record, isOpen = true, onClose }: BookFormPageProps) => {

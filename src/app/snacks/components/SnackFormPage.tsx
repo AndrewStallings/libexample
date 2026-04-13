@@ -8,9 +8,9 @@ import { createSnackDemoService } from "@/snacks/services/snackDemoService";
 
 type SnackFormPageProps = {
   mode: "create" | "edit";
-  record?: SnackRecord;
-  isOpen?: boolean;
-  onClose?: () => void;
+  record?: SnackRecord | undefined;
+  isOpen?: boolean | undefined;
+  onClose?: (() => void) | undefined;
 };
 
 export const SnackFormPage = ({ mode, record, isOpen = true, onClose }: SnackFormPageProps) => {

@@ -29,20 +29,20 @@ const humanizeBackLabel = (href?: string) => {
 
 type ResourceFormPageProps<TService, TRecord, TInput extends Record<string, unknown>> = {
   mode: "create" | "edit";
-  record?: TRecord;
+  record?: TRecord | undefined;
   createService: () => TService;
   description: string;
-  entityLabel?: string;
-  getRecordId?: (record: TRecord) => import("../types/index").EntityId;
+  entityLabel?: string | undefined;
+  getRecordId?: ((record: TRecord) => import("../types/index").EntityId) | undefined;
   createRecord: (service: TService, input: TInput) => Promise<TRecord>;
   updateRecord: (service: TService, record: TRecord, input: TInput) => Promise<TRecord>;
-  onSubmitted?: (record: TRecord, mode: "create" | "edit") => Promise<void> | void;
-  resource?: Pick<ResourceBuilderResult<TRecord, TInput>, "profile" | "toInput" | "route" | "entityLabel" | "navigation">;
-  profile?: ResourceProfile<TRecord, TInput>;
-  toInput?: (record?: TRecord) => TInput;
-  backHref?: string;
-  backLabel?: string;
-  renderBackLink?: (props: { href: string; className: string; children: ReactNode }) => ReactNode;
+  onSubmitted?: ((record: TRecord, mode: "create" | "edit") => Promise<void> | void) | undefined;
+  resource?: Pick<ResourceBuilderResult<TRecord, TInput>, "profile" | "toInput" | "route" | "entityLabel" | "navigation"> | undefined;
+  profile?: ResourceProfile<TRecord, TInput> | undefined;
+  toInput?: ((record?: TRecord | undefined) => TInput) | undefined;
+  backHref?: string | undefined;
+  backLabel?: string | undefined;
+  renderBackLink?: ((props: { href: string; className: string; children: ReactNode }) => ReactNode) | undefined;
 };
 
 export const ResourceFormPage = <TService, TRecord, TInput extends Record<string, unknown>>({

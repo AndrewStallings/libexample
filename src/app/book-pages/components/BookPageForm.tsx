@@ -9,7 +9,7 @@ import { bookPageInputSchema, bookPageStatusOptions, type BookPageInput, type Bo
 type BookPageFormProps = {
   mode: "create" | "edit";
   initialValue: BookPageInput;
-  record?: BookPageRecord;
+  record?: BookPageRecord | undefined;
   onSubmit: (value: BookPageInput) => Promise<void>;
 };
 

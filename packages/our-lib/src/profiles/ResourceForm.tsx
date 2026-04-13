@@ -9,7 +9,7 @@ type ResourceFormProps<TRecord, TInput extends Record<string, unknown>> = {
   profile: ResourceProfile<TRecord, TInput>;
   mode: "create" | "edit";
   initialValue: TInput;
-  record?: TRecord;
+  record?: TRecord | undefined;
   onSubmit: (value: TInput) => Promise<void>;
 };
 

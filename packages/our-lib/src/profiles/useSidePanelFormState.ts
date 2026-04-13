@@ -7,18 +7,18 @@ import { useResourceFormState, type UseResourceFormStateOptions } from "./useRes
 
 type UseSidePanelFormStateOptions<TService, TRecord, TInput> = {
   mode: "create" | "edit";
-  record?: TRecord;
-  isOpen?: boolean;
-  onClose?: () => void;
+  record?: TRecord | undefined;
+  isOpen?: boolean | undefined;
+  onClose?: (() => void) | undefined;
   createService: () => TService;
   queryKey: QueryKey;
   createRecord: (service: TService, input: TInput) => Promise<TRecord>;
   updateRecord: (service: TService, currentRecord: TRecord, input: TInput) => Promise<TRecord>;
   getRecordId: (record: TRecord) => EntityId;
-  entityLabel?: string;
-  getCreatedMessage?: (record: TRecord) => string;
-  getUpdatedMessage?: (record: TRecord) => string;
-  getMissingRecordMessage?: () => string;
+  entityLabel?: string | undefined;
+  getCreatedMessage?: ((record: TRecord) => string) | undefined;
+  getUpdatedMessage?: ((record: TRecord) => string) | undefined;
+  getMissingRecordMessage?: (() => string) | undefined;
 };
 
 export const useSidePanelFormState = <TService, TRecord, TInput>({

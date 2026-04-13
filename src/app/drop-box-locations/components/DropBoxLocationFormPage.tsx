@@ -5,17 +5,25 @@ import { FormShell, ResourceForm, useSidePanelFormState } from "our-lib";
 import { DROP_BOX_LOCATIONS_QUERY_KEY } from "@/drop-box-locations/components/DropBoxLocationsLibraryPage";
 import { toDropBoxLocationInput } from "@/drop-box-locations/data/dropBoxLocationRepository";
 import { dropBoxLocationProfile } from "@/drop-box-locations/models/profile";
-import type { DropBoxLocationInput, DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
+import type {
+  DropBoxLocationInput,
+  DropBoxLocationRecord,
+} from "@/drop-box-locations/models/schemas";
 import { createDropBoxLocationService } from "@/drop-box-locations/services/dropBoxLocationService";
 
 type DropBoxLocationFormPageProps = {
   mode: "create" | "edit";
-  record?: DropBoxLocationRecord;
-  isOpen?: boolean;
-  onClose?: () => void;
+  record?: DropBoxLocationRecord | undefined;
+  isOpen?: boolean | undefined;
+  onClose?: (() => void) | undefined;
 };
 
-export const DropBoxLocationFormPage = ({ mode, record, isOpen = true, onClose }: DropBoxLocationFormPageProps) => {
+export const DropBoxLocationFormPage = ({
+  mode,
+  record,
+  isOpen = true,
+  onClose,
+}: DropBoxLocationFormPageProps) => {
   const service = useMemo(() => createDropBoxLocationService(), []);
   const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<
     ReturnType<typeof createDropBoxLocationService>,
@@ -28,8 +36,10 @@ export const DropBoxLocationFormPage = ({ mode, record, isOpen = true, onClose }
     onClose,
     createService: () => service,
     queryKey: [DROP_BOX_LOCATIONS_QUERY_KEY],
-    createRecord: (serviceValue, input) => serviceValue.repository.create(input),
-    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.repository.update(currentRecordValue.locationId, input),
+    createRecord: (serviceValue, input) =>
+      serviceValue.repository.create(input),
+    updateRecord: (serviceValue, currentRecordValue, input) =>
+      serviceValue.repository.update(currentRecordValue.locationId, input),
     getRecordId: (currentRecordValue) => currentRecordValue.locationId,
     entityLabel: "location",
   });

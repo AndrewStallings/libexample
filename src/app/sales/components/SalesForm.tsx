@@ -10,9 +10,9 @@ import type { SaleInput, SaleRecord } from "@/sales/models/schemas";
 type SalesFormProps = {
   mode: "create" | "edit" | "read";
   initialValue: SaleInput;
-  record?: SaleRecord;
+  record?: SaleRecord | undefined;
   onSubmit: (value: SaleInput) => Promise<void>;
-  onImportObject?: () => void;
+  onImportObject?: (() => void) | undefined;
 };
 
 const sampleImportedSale: SaleInput = {

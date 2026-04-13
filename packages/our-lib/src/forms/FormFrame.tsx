@@ -5,9 +5,9 @@ import type { EntityId, UpdatedAtValue } from "../types/index";
 
 type FormFrameProps = {
   title: string;
-  recordId?: EntityId;
-  updatedBy?: string;
-  updatedAt?: UpdatedAtValue;
+  recordId?: EntityId | undefined;
+  updatedBy?: string | undefined;
+  updatedAt?: UpdatedAtValue | undefined;
   children: ReactNode;
   footer: ReactNode;
 };

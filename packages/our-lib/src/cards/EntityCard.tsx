@@ -2,18 +2,18 @@ import type { ReactNode } from "react";
 
 export type EntityCardItem = {
   value: ReactNode;
-  label?: string;
-  prominent?: boolean;
+  label?: string | undefined;
+  prominent?: boolean | undefined;
 };
 
 export type EntityCardSection = {
   items: EntityCardItem[];
-  title?: string;
+  title?: string | undefined;
 };
 
 type EntityCardProps = {
   sections: EntityCardSection[];
-  actions?: ReactNode;
+  actions?: ReactNode | undefined;
 };
 
 export const EntityCard = ({ sections, actions }: EntityCardProps) => {
