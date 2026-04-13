@@ -55,7 +55,7 @@
   "dependencies": {
     "@tanstack/react-form": "^1.0.0",
     "drizzle-orm": "^0.44.0",
-    "zod": "^3.24.0"
+    "zod": "^4.0.0"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.99.0",

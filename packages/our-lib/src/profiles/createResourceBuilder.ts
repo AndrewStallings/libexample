@@ -1,4 +1,4 @@
-import type { SafeParseReturnType, ZodType } from "zod";
+import type { ZodSafeParseResult, ZodType } from "zod";
 import type { AuditLogger, RecordRepository, ResourceService } from "../dal/contracts";
 import { createRecordResource } from "../dal/createRecordResource";
 import type { EntityId, UpdatedAtValue } from "../types/index";
@@ -21,7 +21,7 @@ const humanizeRoute = (route: string) => {
 };
 
 export type ValidatedResourceService<TRecord, TInput> = ResourceService<TRecord, TInput, TInput> & {
-  validate: (input: TInput) => SafeParseReturnType<TInput, TInput>;
+  validate: (input: TInput) => ZodSafeParseResult<TInput>;
 };
 
 export type ResourceBuilderConfig<TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown> = {
