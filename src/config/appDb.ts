@@ -1,7 +1,7 @@
 import "server-only";
 
 import { drizzle } from "drizzle-orm/node-mssql";
-import type { AuditLogDb } from "our-lib";
+import { createAuditLogRepository, type AuditLogRepository } from "our-lib";
 
 const getRequiredEnv = (name: string, fallbackValue: string) => {
   return process.env[name] ?? fallbackValue;
@@ -20,16 +20,18 @@ const createAppConnectionString = () => {
 };
 
 type AppDb = {
-  auditLogs: AuditLogDb;
+  auditLogs: AuditLogRepository;
 };
 
 let appDb: AppDb | undefined;
 
 export const getAppDb = () => {
   appDb ??= {
-    auditLogs: drizzle({
-      connection: createAppConnectionString(),
-    }) as AuditLogDb,
+    auditLogs: createAuditLogRepository(
+      drizzle({
+        connection: createAppConnectionString(),
+      }),
+    ),
   };
 
   return appDb;

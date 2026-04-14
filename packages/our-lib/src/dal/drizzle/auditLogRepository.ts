@@ -22,7 +22,12 @@ export type AuditLogDb = {
   update: (table: any) => any;
 };
 
-export type InMemoryAuditLogDb = AuditLogDb & {
+export type AuditLogRepository = {
+  insert: (input: AuditLogWriteInput) => Promise<number>;
+  update: (auditLogId: number, input: AuditLogUpdateInput) => Promise<number>;
+};
+
+export type InMemoryAuditLogRepository = AuditLogRepository & {
   getRows: () => AuditLogRow[];
   reset: () => void;
 };
@@ -76,48 +81,39 @@ export const updateAuditLog = async (db: AuditLogDb, auditLogId: number, input: 
   return updated.auditLogId;
 };
 
-export const createInMemoryAuditLogDb = (): InMemoryAuditLogDb => {
+export const createAuditLogRepository = (db: AuditLogDb): AuditLogRepository => {
+  return {
+    insert: async (input) => insertAuditLog(db, input),
+    update: async (auditLogId, input) => updateAuditLog(db, auditLogId, input),
+  };
+};
+
+export const createInMemoryAuditLogRepository = (): InMemoryAuditLogRepository => {
   const rows: AuditLogRow[] = [];
   let nextAuditLogId = 1;
 
   return {
-    insert: () => ({
-      output: () => ({
-        values: async (values: AuditLogInsertRow) => {
-          const row: AuditLogRow = {
-            auditLogId: nextAuditLogId++,
-            server: values.server,
-            shortNote: values.shortNote,
-            longNote: values.longNote ?? null,
-            time: values.time,
-            source: values.source,
-            category: values.category,
-            severity: values.severity,
-            route: values.route,
-            userId: values.userId,
-          };
+    insert: async (input) => {
+      const row = toAuditLogRow(input);
+      const created: AuditLogRow = {
+        auditLogId: nextAuditLogId++,
+        ...row,
+      };
 
-          rows.push(row);
-          return [{ auditLogId: row.auditLogId }];
-        },
-      }),
-    }),
-    update: () => ({
-      set: (values: Partial<AuditLogInsertRow>) => ({
-        where: () => ({
-          output: async () => {
-            const currentRow = rows.at(-1);
+      rows.push(created);
+      return created.auditLogId;
+    },
+    update: async (auditLogId, input) => {
+      const updatedValues = toAuditLogUpdateRow(input);
+      const currentRow = rows.find((row) => row.auditLogId === auditLogId);
 
-            if (!currentRow) {
-              return [];
-            }
+      if (!currentRow) {
+        throw new Error(`Audit log ${auditLogId} was not found.`);
+      }
 
-            Object.assign(currentRow, values);
-            return [{ auditLogId: currentRow.auditLogId }];
-          },
-        }),
-      }),
-    }),
+      Object.assign(currentRow, updatedValues);
+      return currentRow.auditLogId;
+    },
     getRows: () => [...rows],
     reset: () => {
       rows.length = 0;

@@ -1,5 +1,5 @@
 import type { AuditLogEntry, AuditLogger, Logger } from "./contracts";
-import { insertAuditLog, type AuditLogDb } from "./drizzle/auditLogRepository";
+import type { AuditLogRepository } from "./drizzle/auditLogRepository";
 
 export class InMemoryLogger<TEntry> implements Logger<TEntry> {
   public readonly entries: TEntry[] = [];
@@ -12,10 +12,10 @@ export class InMemoryLogger<TEntry> implements Logger<TEntry> {
 export class InMemoryAuditLogger extends InMemoryLogger<AuditLogEntry> implements AuditLogger {}
 
 export class DbAuditLogger implements AuditLogger {
-  constructor(private readonly db: AuditLogDb) {}
+  constructor(private readonly repository: AuditLogRepository) {}
 
   write = async (entry: AuditLogEntry): Promise<void> => {
-    await insertAuditLog(this.db, {
+    await this.repository.insert({
       server: entry.server,
       shortNote: entry.shortNote,
       longNote: entry.longNote,

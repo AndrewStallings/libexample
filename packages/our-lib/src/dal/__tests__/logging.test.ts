@@ -32,21 +32,15 @@ describe("logging helpers", () => {
   it("writes audit entries through the drizzle audit log repository", async () => {
     let insertedValues: unknown;
 
-    const db = {
-      insert: () => ({
-        output: () => ({
-          values: async (values: unknown) => {
-            insertedValues = values;
-            return [{ auditLogId: 101 }];
-          },
-        }),
-      }),
-      update: () => {
-        throw new Error("update should not be called in this test");
+    const repository = {
+      insert: async (values: unknown) => {
+        insertedValues = values;
+        return 101;
       },
+      update: async () => 101,
     };
 
-    const logger = new DbAuditLogger(db);
+    const logger = new DbAuditLogger(repository);
 
     await logger.write({
       server: "sql-01",
@@ -64,7 +58,7 @@ describe("logging helpers", () => {
       expect.objectContaining({
         server: "sql-01",
         shortNote: "audit created",
-        time: new Date("2026-04-14T12:30:00.000Z"),
+        time: "2026-04-14T12:30:00.000Z",
       }),
     );
   });
