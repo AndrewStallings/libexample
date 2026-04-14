@@ -1,5 +1,5 @@
 import type { ReviewInput, ReviewRecord } from "@/reviews/models/schemas";
-import { getReviewById, toReviewInput } from "@/reviews/services/reviewDemoService";
+import { getReviewById, toReviewInput } from "@/reviews/services/reviewService";
 
 export const createReviewInput = (overrides: Partial<ReviewInput> = {}): ReviewInput => {
   return {

@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { BookPagesLibraryPage } from "@/book-pages/components/BookPagesLibraryPage";
 import { BOOKS_QUERY_KEY } from "@/books/components/BooksLibraryPage";
-import { listBooks } from "@/books/services/bookDemoService";
+import { createBookService } from "@/books/services/bookService";
 
 type BookPagesRouteClientProps = {
   bookId: string;
 };
 
 export const BookPagesRouteClient = ({ bookId }: BookPagesRouteClientProps) => {
+  const service = useMemo(() => createBookService(), []);
   const { data: books = [] } = useQuery({
     queryKey: [BOOKS_QUERY_KEY],
-    queryFn: listBooks,
+    queryFn: async () => (await service.repository.list()).items,
   });
   const book = books.find((record) => record.bookId === bookId);
 

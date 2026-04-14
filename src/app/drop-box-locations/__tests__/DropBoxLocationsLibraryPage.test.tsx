@@ -18,7 +18,7 @@ describe("DropBoxLocationsLibraryPage", () => {
   it("renders generated resource cards and form links", async () => {
     renderWithAppProviders(<DropBoxLocationsLibraryPage />);
 
-    expect(screen.getByText("Drop box locations use a generated card and form layout.")).toBeInTheDocument();
+    expect(screen.getByText("Generated library primitives driving a real resource workflow.")).toBeInTheDocument();
     expect(await screen.findByText("North Campus Main Hall")).toBeInTheDocument();
     expect(await screen.findAllByRole("button", { name: "Open Form" })).toHaveLength(2);
   });

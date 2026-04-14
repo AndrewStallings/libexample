@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
 import { BookPageFormPage } from "@/book-pages/components/BookPageFormPage";
-import { listBookPagesByBookId } from "@/book-pages/services/bookPageDemoService";
+import { createBookPageService } from "@/book-pages/services/bookPageService";
 import type { BookPageRecord } from "@/book-pages/models/schemas";
 import type { BookRecord } from "@/books/models/schemas";
 
@@ -17,11 +17,12 @@ type BookPagesLibraryPageProps = {
 };
 
 export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
+  const service = useMemo(() => createBookPageService(), []);
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<BookPageRecord | undefined>();
   const { data: pageRecords = [] } = useQuery({
     queryKey: getBookPagesQueryKey(book.bookId),
-    queryFn: () => listBookPagesByBookId(book.bookId),
+    queryFn: async () => (await service.repository.listByBookId(book.bookId)).items,
   });
 
   const closePanel = () => {
@@ -30,21 +31,21 @@ export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-10 md:px-8">
-      <section className="max-w-5xl">
-        <Link className="text-sm font-semibold transition hover:opacity-80" href="/books">
+    <main className="app-shell">
+      <section className="app-hero">
+        <Link className="app-back-link" href="/books">
           Back to books
         </Link>
-        <p className="mt-4 text-sm uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+        <p className="app-kicker" style={{ marginTop: "1.25rem" }}>
           Child Records Stress Test
         </p>
-        <h1 className="mt-3 text-5xl font-semibold leading-tight">{book.title} Pages</h1>
-        <p className="mt-4 text-lg" style={{ color: "var(--muted)" }}>
+        <h1 className="app-title">{book.title} Pages</h1>
+        <p className="app-copy">
           Each page card shows 15 data points to pressure-test the viewing abstraction with a denser child-record surface.
         </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="app-actions">
           <button
-            className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            className="app-primary-button"
             onClick={() => {
               setSelectedRecord(undefined);
               setPanelMode("create");
@@ -56,7 +57,7 @@ export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
         </div>
       </section>
 
-      <section className="space-y-6">
+      <section className="app-card-stack">
         {pageRecords.map((record) => (
           <EntityCard
             key={record.pageId}

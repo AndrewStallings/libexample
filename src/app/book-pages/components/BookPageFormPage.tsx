@@ -3,9 +3,10 @@
 import { FormShell, useSidePanelFormState } from "our-lib";
 import { getBookPagesQueryKey } from "@/book-pages/components/BookPagesLibraryPage";
 import { BookPageForm } from "@/book-pages/components/BookPageForm";
-import { createBookPageDemoService, toBookPageInput } from "@/book-pages/services/bookPageDemoService";
+import { createBookPageService, toBookPageInput } from "@/book-pages/services/bookPageService";
 import type { BookPageRecord } from "@/book-pages/models/schemas";
 import type { BookRecord } from "@/books/models/schemas";
+import { useMemo } from "react";
 
 type BookPageFormPageProps = {
   mode: "create" | "edit";
@@ -16,8 +17,9 @@ type BookPageFormPageProps = {
 };
 
 export const BookPageFormPage = ({ mode, book, pageRecord, isOpen = true, onClose }: BookPageFormPageProps) => {
+  const service = useMemo(() => createBookPageService(), []);
   const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<
-    ReturnType<typeof createBookPageDemoService>,
+    ReturnType<typeof createBookPageService>,
     BookPageRecord,
     ReturnType<typeof toBookPageInput>
   >({
@@ -25,10 +27,10 @@ export const BookPageFormPage = ({ mode, book, pageRecord, isOpen = true, onClos
     record: pageRecord,
     isOpen,
     onClose,
-    createService: createBookPageDemoService,
+    createService: () => service,
     queryKey: getBookPagesQueryKey(book.bookId),
-    createRecord: (service, input) => service.create(input, "demo-user"),
-    updateRecord: (service, currentRecordValue, input) => service.update(currentRecordValue.pageId, input, "demo-user"),
+    createRecord: (serviceValue, input) => serviceValue.repository.create(input),
+    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.repository.update(currentRecordValue.pageId, input),
     getRecordId: (currentRecordValue) => currentRecordValue.pageId,
     entityLabel: "page record",
     getCreatedMessage: (created) => `Created ${created.pageId} for ${book.title}.`,

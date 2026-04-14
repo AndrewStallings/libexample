@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { libAccentBadgeStyle, libPanelStyle } from "../styles";
+
 export type EntityCardItem = {
   value: ReactNode;
   label?: string | undefined;
@@ -19,14 +21,15 @@ type EntityCardProps = {
 export const EntityCard = ({ sections, actions }: EntityCardProps) => {
   return (
     <article
-      className="overflow-hidden rounded-3xl border"
+      className="overflow-hidden rounded-[1.75rem] border"
       style={{
-        borderColor: "rgba(31, 41, 55, 0.12)",
-        background: "linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 252, 246, 0.92))",
-        boxShadow: "0 20px 60px rgba(98, 74, 39, 0.12)",
+        ...libPanelStyle,
+        backgroundColor: "var(--lib-surface)",
+        boxShadow: "0 20px 48px rgba(15, 23, 42, 0.10)",
       }}
     >
-      <div className="flex flex-col md:flex-row">
+      <div className="h-1.5 bg-[linear-gradient(90deg,var(--lib-primary),rgba(92,157,174,0.55))]" />
+      <div className="flex flex-col lg:flex-row">
         <div
           className="grid flex-1"
           style={{
@@ -36,24 +39,31 @@ export const EntityCard = ({ sections, actions }: EntityCardProps) => {
           {sections.map((section, index) => (
             <section
               key={index}
-              className="border-b px-6 py-6 last:border-b-0 md:border-b-0 md:border-r last:md:border-r-0"
-              style={{ borderColor: "rgba(31, 41, 55, 0.08)" }}
+              className="border-b border-[color:var(--lib-border)] px-6 py-6 last:border-b-0 dark:border-white/10 md:border-b-0 md:border-r last:md:border-r-0"
             >
               {section.title ? (
-                <div className="mb-4 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+                <div className="mb-5 text-[11px] font-semibold uppercase text-slate-500 dark:text-slate-400" style={libAccentBadgeStyle}>
                   {section.title}
                 </div>
               ) : null}
-              <ul className="space-y-4">
+              <ul className="space-y-3">
                 {section.items.map((item, itemIndex) => (
-                  <li key={item.label ?? itemIndex} className="rounded-2xl border bg-white/70 px-4 py-3" style={{ borderColor: "rgba(31, 41, 55, 0.06)" }}>
+                  <li
+                    key={item.label ?? itemIndex}
+                    className="rounded-[1.25rem] border px-4 py-4"
+                    style={{
+                      backgroundColor: "var(--lib-surface-strong)",
+                      borderColor: "var(--lib-border)",
+                      boxShadow: "inset 3px 0 0 var(--lib-primary)",
+                    }}
+                  >
                     <div className="min-w-0">
                       {item.label ? (
-                        <div className="mb-1 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
+                        <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
                           {item.label}
                         </div>
                       ) : null}
-                      <div className={item.prominent ? "text-xl font-semibold leading-snug" : "text-base leading-6"} style={{ color: "var(--foreground)" }}>
+                      <div className={item.prominent ? "text-[1.35rem] font-semibold leading-snug text-slate-900 dark:text-white" : "text-base leading-7 text-slate-800 dark:text-slate-100"}>
                         {item.value}
                       </div>
                     </div>
@@ -66,15 +76,16 @@ export const EntityCard = ({ sections, actions }: EntityCardProps) => {
 
         {actions ? (
           <aside
-            className="border-t px-5 py-6 md:border-t-0 md:border-l"
+            className="border-t px-5 py-6 lg:border-t-0 lg:border-l"
             style={{
-              borderColor: "rgba(31, 41, 55, 0.08)",
-              backgroundColor: "rgba(240, 231, 216, 0.32)",
               minWidth: "14rem",
               maxWidth: "16rem",
+              background: "var(--lib-actions-bg)",
+              borderColor: "var(--lib-border)",
+              color: "var(--lib-action-button-ink)",
             }}
           >
-            <div className="mb-3 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+            <div className="mb-4 text-[11px] font-semibold uppercase" style={libAccentBadgeStyle}>
               Actions
             </div>
             <div className="flex flex-col gap-3">{actions}</div>

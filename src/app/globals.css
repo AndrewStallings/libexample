@@ -1,15 +1,157 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f1ea;
-  --surface: #fffdf9;
-  --surface-strong: #f0e7d8;
-  --foreground: #1f2937;
-  --muted: #5f6b7a;
-  --accent: #0f766e;
-  --accent-strong: #115e59;
+  --background: #f9f6ef;
+  --surface: #fffdf8;
+  --surface-strong: #f5efe6;
+  --foreground: #1b2135;
+  --muted: #6b7085;
+  --accent: #00249c;
+  --accent-strong: #001c77;
   --danger: #b91c1c;
-  --border: #d7cbb8;
+  --border: rgba(54, 62, 90, 0.12);
+
+  --lib-primary: #00249c;
+  --lib-primary-strong: #001c77;
+  --lib-primary-soft: rgba(0, 36, 156, 0.1);
+  --lib-sky: #5c9dae;
+  --lib-sky-soft: rgba(92, 157, 174, 0.12);
+  --lib-purple: #371d4f;
+  --lib-purple-soft: rgba(55, 29, 79, 0.08);
+  --lib-ink: #1b2135;
+  --lib-slate: #333333;
+  --lib-muted: #6b7085;
+  --lib-surface: #fffdf8;
+  --lib-surface-strong: #f5efe6;
+  --lib-border: rgba(54, 62, 90, 0.12);
+  --lib-border-strong: rgba(0, 36, 156, 0.24);
+  --lib-danger: #b42318;
+  --lib-panel-hero:
+    linear-gradient(145deg, rgba(255, 254, 250, 0.98) 0%, rgba(247, 240, 230, 0.98) 54%, rgba(237, 244, 255, 0.98) 100%);
+  --lib-panel-hero-ink: #1b2135;
+  --lib-panel-hero-copy: #626b84;
+  --lib-panel-accent: #2441a4;
+  --lib-panel-button-bg: rgba(255, 255, 255, 0.52);
+  --lib-panel-button-border: rgba(0, 36, 156, 0.12);
+  --lib-panel-button-ink: #1b2135;
+  --lib-panel-body:
+    linear-gradient(180deg, rgba(253, 251, 246, 0.98), rgba(255, 255, 255, 1));
+  --lib-status-bg: rgba(92, 157, 174, 0.12);
+  --lib-status-ink: #16379f;
+  --lib-actions-bg:
+    linear-gradient(180deg, rgba(245, 238, 229, 0.98) 0%, rgba(239, 245, 255, 0.98) 100%);
+  --lib-action-button-bg: rgba(255, 255, 255, 0.74);
+  --lib-action-button-border: rgba(0, 36, 156, 0.12);
+  --lib-action-button-ink: #1b2135;
+  --lib-action-button-hover: rgba(0, 36, 156, 0.08);
+
+  --app-background:
+    radial-gradient(circle at 12% 16%, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0) 18%),
+    radial-gradient(circle at 86% 12%, rgba(92, 157, 174, 0.13) 0%, transparent 23%),
+    linear-gradient(180deg, #fffefb 0%, #f9f6ef 46%, #f3ede2 100%);
+  --app-pattern: radial-gradient(rgba(102, 112, 133, 0.12) 0.75px, transparent 0.95px);
+  --app-pattern-size: 18px 18px;
+  --app-pattern-opacity: 0.34;
+  --app-decoration:
+    radial-gradient(circle, rgba(0, 36, 156, 0.14) 0%, rgba(92, 157, 174, 0.1) 46%, transparent 74%);
+  --app-hero-bg:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.84) 0%, rgba(248, 241, 232, 0.98) 52%, rgba(239, 245, 255, 0.98) 100%);
+  --app-hero-overlay: linear-gradient(120deg, transparent 10%, rgba(255, 255, 255, 0.42) 100%);
+  --app-hero-burst:
+    radial-gradient(circle, rgba(0, 36, 156, 0.16) 0%, rgba(92, 157, 174, 0.1) 38%, transparent 72%);
+  --app-hero-border: rgba(34, 42, 74, 0.1);
+  --app-hero-shadow: 0 26px 72px rgba(45, 51, 72, 0.12);
+  --app-hero-title: #182038;
+  --app-hero-copy: rgba(58, 66, 95, 0.82);
+  --app-hero-kicker: #2441a4;
+  --app-back-link: #54607c;
+  --app-button-bg: #00249c;
+  --app-button-fg: #ffffff;
+  --app-button-border: rgba(0, 36, 156, 0.1);
+  --app-button-shadow: 0 16px 34px rgba(0, 36, 156, 0.2);
+  --app-button-hover: #001c77;
+}
+
+.dark {
+  --background: #07101d;
+  --surface: #0d1630;
+  --surface-strong: #15203b;
+  --foreground: #edf3ff;
+  --muted: #b7c6e6;
+  --accent: #b4cbff;
+  --accent-strong: #dbe7ff;
+  --danger: #f87171;
+  --border: rgba(150, 177, 235, 0.18);
+
+  --lib-primary: #86a8ff;
+  --lib-primary-strong: #dce7ff;
+  --lib-primary-soft: rgba(134, 168, 255, 0.18);
+  --lib-sky: #9ad8ea;
+  --lib-sky-soft: rgba(154, 216, 234, 0.16);
+  --lib-purple: #baa8de;
+  --lib-purple-soft: rgba(186, 168, 222, 0.14);
+  --lib-ink: #f3f7ff;
+  --lib-slate: #d7e2f8;
+  --lib-muted: #afc0e6;
+  --lib-surface: #0d1630;
+  --lib-surface-strong: #15203b;
+  --lib-border: rgba(162, 182, 235, 0.18);
+  --lib-border-strong: rgba(180, 202, 255, 0.34);
+  --lib-danger: #ff9a92;
+  --lib-panel-hero:
+    radial-gradient(1.2px 1.2px at 18px 22px, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1.6px 1.6px at 140px 68px, rgba(255, 255, 255, 0.7), transparent 60%),
+    radial-gradient(1px 1px at 88px 148px, rgba(172, 206, 255, 0.85), transparent 60%),
+    linear-gradient(135deg, #061022 0%, #10275f 52%, #040914 100%);
+  --lib-panel-hero-ink: #f8fbff;
+  --lib-panel-hero-copy: rgba(224, 234, 255, 0.84);
+  --lib-panel-accent: rgba(219, 231, 255, 0.86);
+  --lib-panel-button-bg: rgba(255, 255, 255, 0.08);
+  --lib-panel-button-border: rgba(255, 255, 255, 0.16);
+  --lib-panel-button-ink: #ffffff;
+  --lib-panel-body: linear-gradient(180deg, rgba(9, 16, 34, 0.98), rgba(13, 22, 48, 1));
+  --lib-status-bg: rgba(134, 168, 255, 0.14);
+  --lib-status-ink: #e4edff;
+  --lib-actions-bg:
+    radial-gradient(1.2px 1.2px at 18px 28px, rgba(255, 255, 255, 0.82), transparent 60%),
+    radial-gradient(1px 1px at 120px 110px, rgba(171, 203, 255, 0.7), transparent 60%),
+    linear-gradient(180deg, #081022 0%, #0e1f45 100%);
+  --lib-action-button-bg: rgba(255, 255, 255, 0.08);
+  --lib-action-button-border: rgba(255, 255, 255, 0.14);
+  --lib-action-button-ink: #ffffff;
+  --lib-action-button-hover: rgba(255, 255, 255, 0.14);
+
+  --app-background:
+    radial-gradient(circle at 16% 12%, rgba(78, 114, 224, 0.26) 0%, transparent 22%),
+    radial-gradient(circle at 82% 14%, rgba(92, 157, 174, 0.18) 0%, transparent 22%),
+    linear-gradient(180deg, #040812 0%, #07101d 48%, #02050d 100%);
+  --app-pattern:
+    radial-gradient(1.2px 1.2px at 20px 30px, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1.6px 1.6px at 120px 90px, rgba(255, 255, 255, 0.65), transparent 60%),
+    radial-gradient(1px 1px at 60px 160px, rgba(151, 189, 255, 0.72), transparent 60%),
+    radial-gradient(1.4px 1.4px at 170px 40px, rgba(255, 255, 255, 0.8), transparent 60%);
+  --app-pattern-size: 220px 220px;
+  --app-pattern-opacity: 0.9;
+  --app-decoration:
+    radial-gradient(circle, rgba(94, 134, 255, 0.22) 0%, rgba(92, 157, 174, 0.16) 34%, transparent 72%);
+  --app-hero-bg:
+    radial-gradient(1.2px 1.2px at 18px 24px, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1.4px 1.4px at 150px 74px, rgba(255, 255, 255, 0.65), transparent 60%),
+    linear-gradient(145deg, rgba(8, 18, 40, 0.98) 0%, rgba(15, 37, 92, 0.98) 56%, rgba(8, 16, 35, 0.98) 100%);
+  --app-hero-overlay: linear-gradient(120deg, transparent 8%, rgba(255, 255, 255, 0.06) 100%);
+  --app-hero-burst:
+    radial-gradient(circle, rgba(92, 157, 174, 0.34) 0%, rgba(92, 157, 174, 0.14) 38%, transparent 72%);
+  --app-hero-border: rgba(255, 255, 255, 0.08);
+  --app-hero-shadow: 0 32px 90px rgba(3, 6, 16, 0.38);
+  --app-hero-title: #f7fbff;
+  --app-hero-copy: rgba(231, 238, 255, 0.82);
+  --app-hero-kicker: rgba(205, 220, 255, 0.78);
+  --app-back-link: rgba(222, 232, 252, 0.84);
+  --app-button-bg: #ffffff;
+  --app-button-fg: #0d1730;
+  --app-button-border: rgba(255, 255, 255, 0.14);
+  --app-button-shadow: 0 14px 36px rgba(8, 18, 40, 0.22);
+  --app-button-hover: #f2f6ff;
 }
 
 * {
@@ -17,13 +159,38 @@
 }
 
 body {
+  position: relative;
+  isolation: isolate;
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 28%),
-    linear-gradient(180deg, #f8f5ee 0%, #f4f1ea 100%);
+  background: var(--app-background);
   color: var(--foreground);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Aptos, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: var(--app-pattern);
+  background-size: var(--app-pattern-size);
+  opacity: var(--app-pattern-opacity);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: -8rem;
+  right: -7rem;
+  width: 28rem;
+  height: 28rem;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 999px;
+  background: var(--app-decoration);
+  filter: blur(22px);
 }
 
 a {
@@ -36,4 +203,140 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+.app-shell {
+  position: relative;
+  margin-inline: auto;
+  display: flex;
+  min-height: 100vh;
+  width: min(100%, 88rem);
+  flex-direction: column;
+  gap: 2.5rem;
+  padding: 3rem 1rem;
+}
+
+.app-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--app-hero-border);
+  border-radius: 2rem;
+  padding: 2rem;
+  background: var(--app-hero-bg);
+  box-shadow: var(--app-hero-shadow);
+  color: var(--app-hero-title);
+}
+
+.app-hero::before {
+  content: "";
+  position: absolute;
+  top: -5rem;
+  right: -3rem;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 999px;
+  background: var(--app-hero-burst);
+  filter: blur(8px);
+}
+
+.app-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--app-hero-overlay);
+  pointer-events: none;
+}
+
+.app-kicker,
+.app-title,
+.app-copy,
+.app-actions,
+.app-back-link {
+  position: relative;
+  z-index: 1;
+}
+
+.app-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--app-back-link);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 150ms ease;
+}
+
+.app-back-link:hover {
+  color: var(--app-hero-title);
+}
+
+.app-kicker {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--app-hero-kicker);
+}
+
+.app-title {
+  margin: 1rem 0 0;
+  max-width: 48rem;
+  color: var(--app-hero-title);
+  font-size: clamp(2.7rem, 6vw, 4.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.app-copy {
+  margin: 1.25rem 0 0;
+  max-width: 40rem;
+  color: var(--app-hero-copy);
+  font-size: 1.08rem;
+  line-height: 1.85;
+}
+
+.app-actions {
+  margin-top: 1.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.app-primary-button {
+  appearance: none;
+  border: 1px solid var(--app-button-border);
+  border-radius: 1rem;
+  background: var(--app-button-bg);
+  color: var(--app-button-fg);
+  padding: 0.9rem 1.2rem;
+  font-size: 0.96rem;
+  font-weight: 700;
+  box-shadow: var(--app-button-shadow);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+}
+
+.app-primary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 42px rgba(8, 18, 40, 0.18);
+  background: var(--app-button-hover);
+}
+
+.app-card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    padding-inline: 2rem;
+  }
+
+  .app-hero {
+    padding: 2.5rem;
+  }
 }

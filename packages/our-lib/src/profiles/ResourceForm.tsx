@@ -61,7 +61,10 @@ export const ResourceForm = <TRecord, TInput extends Record<string, unknown>>({
   const formFrameProps = {
     title: profile.getFormTitle(mode, record),
     footer: (
-      <button className="rounded-full bg-teal-700 px-5 py-2 font-semibold text-white transition hover:opacity-90" type="submit">
+      <button
+        className="rounded-xl bg-[color:var(--lib-primary)] px-5 py-2.5 font-medium text-white shadow-[0_12px_30px_rgba(0,36,156,0.18)] transition hover:bg-[color:var(--lib-primary-strong)] dark:ring-1 dark:ring-white/10"
+        type="submit"
+      >
         {profile.getSubmitLabel(mode)}
       </button>
     ),
@@ -78,7 +81,7 @@ export const ResourceForm = <TRecord, TInput extends Record<string, unknown>>({
         setLocalSubmitError(parsed.error.issues[0]?.message ?? "Validation failed");
         return;
       }
-      await onSubmit(parsed.data);
+      await onSubmit(parsed.data as TInput);
     },
   });
 

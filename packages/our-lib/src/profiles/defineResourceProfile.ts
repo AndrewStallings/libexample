@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { ZodType } from "zod";
+import type { ZodObject } from "zod";
 import type { AsyncComboboxOption } from "../forms/Input";
 import type { EntityId, SelectOption, UpdatedAtValue } from "../types/index";
 
@@ -44,7 +44,7 @@ export type ResourceFormField<TInput> =
 
 export type ResourceProfile<TRecord, TInput extends Record<string, unknown>> = {
   entityName: string;
-  inputSchema: ZodType<TInput>;
+  inputSchema: ZodObject;
   getRecordId?: ((record: TRecord) => EntityId | undefined) | undefined;
   getUpdatedAt?: ((record: TRecord) => UpdatedAtValue | undefined) | undefined;
   getUpdatedBy?: ((record: TRecord) => string | undefined) | undefined;

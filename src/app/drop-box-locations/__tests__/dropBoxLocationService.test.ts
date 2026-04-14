@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { InMemoryDropBoxLocationRepository } from "@/drop-box-locations/data/dropBoxLocationRepository";
 import { dropBoxLocationInputSchema } from "@/drop-box-locations/models/schemas";
-import type { DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
-import { createDropBoxLocationService } from "@/drop-box-locations/services/dropBoxLocationService";
+import type { DropBoxLocationInput, DropBoxLocationRecord } from "@/drop-box-locations/models/schemas";
+import { createDropBoxLocationResourceService, createDropBoxLocationService } from "@/drop-box-locations/services/dropBoxLocationService";
 
 describe("InMemoryDropBoxLocationRepository", () => {
   it("creates a drop box location", async () => {
@@ -32,6 +32,67 @@ describe("InMemoryDropBoxLocationRepository", () => {
 });
 
 describe("createDropBoxLocationService", () => {
+  it("creates a drop box location and writes an audit log", async () => {
+    const service = createDropBoxLocationService();
+    const existingEntryCount = service.logging.getEntries().length;
+
+    const created = await service.resource.create(
+      dropBoxLocationInputSchema.parse({
+        locationName: "West Branch Side Entry",
+        campus: "West Campus",
+        building: "Library West",
+        zone: "B2",
+        serviceLevel: "daily",
+        pickupWindow: "09:00 - 11:00",
+        capacity: 140,
+        currentLoad: 32,
+        status: "active",
+        accessCode: "WBS-22",
+        districtManager: "Jordan Kim",
+        climateZone: "Indoor",
+        notes: "Marketing requested audit coverage for branch-side intake.",
+      }),
+      "dropbox-test-user",
+    );
+    const loggedEntry = service.logging.getEntries()[existingEntryCount];
+
+    expect(created.locationId).toBeTruthy();
+    expect(loggedEntry?.shortNote).toBe("dropBoxLocation created");
+    expect(loggedEntry?.userId).toBe("dropbox-test-user");
+  });
+
+  it("logs validation failures before rethrowing them", async () => {
+    const service = createDropBoxLocationService();
+    const existingEntryCount = service.logging.getEntries().length;
+
+    await expect(
+      service.resource.create(
+        {
+          locationName: "No",
+          campus: "",
+          building: "",
+          zone: "",
+          serviceLevel: "daily",
+          pickupWindow: "",
+          capacity: 10,
+          currentLoad: 1,
+          status: "active",
+          accessCode: "A",
+          districtManager: "",
+          climateZone: "",
+          notes: "short",
+        } as DropBoxLocationInput,
+        "dropbox-test-user",
+      ),
+    ).rejects.toThrowError();
+
+    const loggedEntry = service.logging.getEntries()[existingEntryCount];
+
+    expect(loggedEntry?.shortNote).toBe("dropBoxLocation create failed");
+    expect(loggedEntry?.severity).toBe("error");
+    expect(loggedEntry?.userId).toBe("dropbox-test-user");
+  });
+
   it("returns ids with marketing-friendly big numbers", async () => {
     const records: DropBoxLocationRecord[] = [
       {
@@ -115,5 +176,15 @@ describe("createDropBoxLocationService", () => {
     });
 
     await expect(service.getMarketingBigNumberLocationIds()).resolves.toEqual(["DB-100", "DB-1000", "DB-1000000000"]);
+  });
+
+  it("builds resource helpers from the service factory", () => {
+    const resource = createDropBoxLocationResourceService();
+
+    expect(resource).toHaveProperty("list");
+    expect(resource).toHaveProperty("getById");
+    expect(resource).toHaveProperty("create");
+    expect(resource).toHaveProperty("update");
+    expect(resource).toHaveProperty("validate");
   });
 });

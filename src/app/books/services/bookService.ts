@@ -1,35 +1,43 @@
 import { z } from "zod";
-import { createRecordResource, type AuditLogger } from "our-lib";
-import type { BookRepository } from "@/books/data/bookRepository";
+import { createWorkflowService, type AuditLogger } from "our-lib";
 import { bookInputSchema, type BookInput, type BookRecord } from "@/books/models/schemas";
+import { InMemoryBookRepository, type BookRepository, initialBooks } from "@/books/data/bookRepository";
 
-export const createBookService = (
-  repository: BookRepository,
-  logger: AuditLogger,
-) => {
-  const resource = createRecordResource({
+const repository: BookRepository = new InMemoryBookRepository();
+
+export type BookService = {
+  repository: BookRepository;
+};
+
+export const createBookService = () => {
+  return {
+    repository,
+  } satisfies BookService;
+};
+
+export const createBookResourceService = (repository: BookRepository, logger: AuditLogger) => {
+  return createWorkflowService({
     entityName: "book",
     repository,
     logger,
     route: "/books",
     source: "bookService",
     getEntityId: (record) => record.bookId,
+    inputSchema: bookInputSchema,
   });
+};
 
+export const getBookById = (bookId: string): BookRecord | undefined => {
+  return initialBooks.find((record) => record.bookId === bookId);
+};
+
+export const toBookInput = (record?: BookRecord): BookInput => {
   return {
-    list: resource.list,
-    getById: resource.getById,
-    create: async (input: BookInput, userId: string) => {
-      const validated = bookInputSchema.parse(input);
-      return resource.create(validated, userId);
-    },
-    update: async (id: string, input: BookInput, userId: string) => {
-      const validated = bookInputSchema.parse(input);
-      return resource.update(id, validated, userId);
-    },
-    validate: (input: BookInput) => {
-      return bookInputSchema.safeParse(input);
-    },
+    title: record?.title ?? "",
+    status: record?.status ?? "draft",
+    ownerId: record?.ownerId ?? "u-01",
+    ownerName: record?.ownerName ?? "Alex Carter",
+    notes: record?.notes ?? "",
   };
 };
 

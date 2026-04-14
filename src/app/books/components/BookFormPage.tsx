@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { FormShell, useSidePanelFormState } from "our-lib";
 import { BookForm } from "@/books/components/BookForm";
 import { BOOKS_QUERY_KEY } from "@/books/components/BooksLibraryPage";
-import { createBookDemoService, toBookInput } from "@/books/services/bookDemoService";
+import { createBookService, toBookInput } from "@/books/services/bookService";
 import type { BookRecord } from "@/books/models/schemas";
 
 type BookFormPageProps = {
@@ -15,15 +16,16 @@ type BookFormPageProps = {
 };
 
 export const BookFormPage = ({ mode, record, isOpen = true, onClose }: BookFormPageProps) => {
-  const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<ReturnType<typeof createBookDemoService>, BookRecord, ReturnType<typeof toBookInput>>({
+  const service = useMemo(() => createBookService(), []);
+  const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<ReturnType<typeof createBookService>, BookRecord, ReturnType<typeof toBookInput>>({
     mode,
     record,
     isOpen,
     onClose,
-    createService: createBookDemoService,
+    createService: () => service,
     queryKey: [BOOKS_QUERY_KEY],
-    createRecord: (service, input) => service.create(input, "demo-user"),
-    updateRecord: (service, currentRecordValue, input) => service.update(currentRecordValue.bookId, input, "demo-user"),
+    createRecord: (serviceValue, input) => serviceValue.repository.create(input),
+    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.repository.update(currentRecordValue.bookId, input),
     getRecordId: (currentRecordValue) => currentRecordValue.bookId,
   });
 

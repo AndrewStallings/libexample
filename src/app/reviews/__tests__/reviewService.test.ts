@@ -3,7 +3,7 @@ import { InMemoryAuditLogger, createInMemoryRecordRepository } from "our-lib";
 import { initialReviewRows } from "@/reviews/data/reviewRepository";
 import { reviewTypes, reviewerOptions } from "@/reviews/models/lookupData";
 import type { ReviewInput, ReviewRecord } from "@/reviews/models/schemas";
-import { createReviewService } from "@/reviews/services/reviewService";
+import { createReviewResourceService } from "@/reviews/services/reviewService";
 import { createReviewInput } from "@/testing/fixtures/reviews";
 
 const toReviewRecord = (row: (typeof initialReviewRows)[number]): ReviewRecord => {
@@ -69,7 +69,7 @@ describe("createReviewService", () => {
   it("creates a review with lookup-enriched fields and writes an audit log", async () => {
     const repository = createReviewRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createReviewService(repository, logger);
+    const service = createReviewResourceService(repository, logger);
 
     const created = await service.create(
       createReviewInput({
@@ -91,7 +91,7 @@ describe("createReviewService", () => {
   it("rejects approved reviews with a low rating", async () => {
     const repository = createReviewRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createReviewService(repository, logger);
+    const service = createReviewResourceService(repository, logger);
 
     await expect(
       service.create(

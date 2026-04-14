@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { InMemoryAuditLogger, createInMemoryRecordRepository } from "our-lib";
 import { initialBooks } from "@/books/data/bookRepository";
 import type { BookInput, BookRecord } from "@/books/models/schemas";
-import { createBookService, isValidationError } from "@/books/services/bookService";
+import { createBookResourceService, isValidationError } from "@/books/services/bookService";
 import { createBookInput } from "@/testing/fixtures/books";
 
 const createBookRepository = () => {
@@ -32,7 +32,7 @@ describe("createBookService", () => {
   it("creates a book and writes an audit log without touching a database", async () => {
     const repository = createBookRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createBookService(repository, logger);
+    const service = createBookResourceService(repository, logger);
 
     const created = await service.create(
       createBookInput({
@@ -54,7 +54,7 @@ describe("createBookService", () => {
   it("rejects invalid archived notes through zod validation", async () => {
     const repository = createBookRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createBookService(repository, logger);
+    const service = createBookResourceService(repository, logger);
 
     await expect(
       service.create(
@@ -73,7 +73,7 @@ describe("createBookService", () => {
   it("lists the seeded books", async () => {
     const repository = createBookRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createBookService(repository, logger);
+    const service = createBookResourceService(repository, logger);
 
     const result = await service.list();
 
@@ -84,7 +84,7 @@ describe("createBookService", () => {
   it("returns a book by id", async () => {
     const repository = createBookRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createBookService(repository, logger);
+    const service = createBookResourceService(repository, logger);
 
     const record = await service.getById("BK-1001");
 
@@ -95,7 +95,7 @@ describe("createBookService", () => {
   it("updates a book and writes an audit log", async () => {
     const repository = createBookRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createBookService(repository, logger);
+    const service = createBookResourceService(repository, logger);
 
     const updated = await service.update(
       "BK-1001",
@@ -118,7 +118,7 @@ describe("createBookService", () => {
   it("validate returns a successful result for a good payload", () => {
     const repository = createBookRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createBookService(repository, logger);
+    const service = createBookResourceService(repository, logger);
 
     const result = service.validate(
       createBookInput({
@@ -133,7 +133,7 @@ describe("createBookService", () => {
   it("validate returns issues for a bad payload", () => {
     const repository = createBookRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createBookService(repository, logger);
+    const service = createBookResourceService(repository, logger);
 
     const result = service.validate(
       createBookInput({
@@ -153,7 +153,7 @@ describe("createBookService", () => {
   it("exposes zod errors through isValidationError", async () => {
     const repository = createBookRepository();
     const logger = new InMemoryAuditLogger();
-    const service = createBookService(repository, logger);
+    const service = createBookResourceService(repository, logger);
 
     try {
       await service.create(

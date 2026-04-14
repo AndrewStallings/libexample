@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import { libPanelStyle } from "../styles";
 
 type FieldShellProps = {
   label: string;
@@ -12,20 +13,24 @@ type FieldShellProps = {
 const FieldShell = ({ label, description, error, children }: FieldShellProps) => {
   return (
     <label
-      className="flex flex-col gap-2 rounded-2xl border p-4 shadow-sm"
-      style={{ borderColor: "var(--border)", backgroundColor: "var(--surface)" }}
+      className="flex flex-col gap-2 rounded-[1.5rem] border p-4"
+      style={{
+        ...libPanelStyle,
+        backgroundColor: "var(--lib-surface-strong)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.56)",
+      }}
     >
-      <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
+      <span className="text-sm font-semibold text-slate-800 dark:text-white">
         {label}
       </span>
       {description ? (
-        <span className="text-xs" style={{ color: "var(--muted)" }}>
+        <span className="text-xs leading-5 text-slate-500 dark:text-slate-300">
           {description}
         </span>
       ) : null}
       {children}
       {error ? (
-        <span className="text-sm" style={{ color: "var(--danger)" }}>
+        <span className="text-sm text-red-700 dark:text-red-300">
           {error}
         </span>
       ) : null}
@@ -44,8 +49,8 @@ export const TextInput = ({ label, description, error, ...props }: TextInputProp
     <FieldShell label={label} description={description} error={error}>
       <input
         {...props}
-        className="rounded-xl border bg-white px-3 py-2 outline-none transition"
-        style={{ borderColor: "var(--border)" }}
+        className="rounded-xl border bg-[color:var(--lib-surface)] px-3 py-2.5 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[color:var(--lib-primary)] focus:ring-4 focus:ring-[color:var(--lib-primary-soft)] dark:text-white dark:placeholder:text-slate-400"
+        style={{ borderColor: "var(--lib-border)" }}
       />
     </FieldShell>
   );
@@ -62,8 +67,8 @@ export const TextArea = ({ label, description, error, ...props }: TextAreaProps)
     <FieldShell label={label} description={description} error={error}>
       <textarea
         {...props}
-        className="min-h-28 rounded-xl border bg-white px-3 py-2 outline-none transition"
-        style={{ borderColor: "var(--border)" }}
+        className="min-h-28 rounded-xl border bg-[color:var(--lib-surface)] px-3 py-2.5 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[color:var(--lib-primary)] focus:ring-4 focus:ring-[color:var(--lib-primary-soft)] dark:text-white dark:placeholder:text-slate-400"
+        style={{ borderColor: "var(--lib-border)" }}
       />
     </FieldShell>
   );
@@ -81,8 +86,8 @@ export const SelectInput = ({ label, description, error, options, ...props }: Se
     <FieldShell label={label} description={description} error={error}>
       <select
         {...props}
-        className="rounded-xl border bg-white px-3 py-2 outline-none transition"
-        style={{ borderColor: "var(--border)" }}
+        className="rounded-xl border bg-[color:var(--lib-surface)] px-3 py-2.5 text-slate-900 outline-none transition focus:border-[color:var(--lib-primary)] focus:ring-4 focus:ring-[color:var(--lib-primary-soft)] dark:text-white"
+        style={{ borderColor: "var(--lib-border)" }}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -164,7 +169,7 @@ export const AsyncCombobox = ({
           {...props}
           aria-autocomplete="list"
           aria-expanded={open}
-          className="w-full rounded-xl border bg-white px-3 py-2 outline-none transition"
+          className="w-full rounded-xl border bg-[color:var(--lib-surface)] px-3 py-2.5 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[color:var(--lib-primary)] focus:ring-4 focus:ring-[color:var(--lib-primary-soft)] dark:text-white dark:placeholder:text-slate-400"
           disabled={disabled}
           onBlur={() => {
             window.setTimeout(() => {
@@ -181,22 +186,27 @@ export const AsyncCombobox = ({
           }}
           placeholder={placeholder}
           role="combobox"
-          style={{ borderColor: "var(--border)" }}
+          style={{ borderColor: "var(--lib-border)" }}
           value={query}
         />
         {open ? (
           <div
-            className="absolute z-10 mt-2 max-h-64 w-full overflow-auto rounded-2xl border bg-white p-2 shadow-lg"
+            className="absolute z-10 mt-2 max-h-64 w-full overflow-auto rounded-[1.25rem] border p-2 shadow-lg"
             role="listbox"
-            style={{ borderColor: "var(--border)" }}
+            style={{
+              ...libPanelStyle,
+              backgroundColor: "var(--lib-surface)",
+              borderColor: "var(--lib-border-strong)",
+              boxShadow: "0 20px 44px rgba(15, 23, 42, 0.10)",
+            }}
           >
-            {loading ? <div className="px-3 py-2 text-sm">Loading...</div> : null}
-            {!loading && options.length === 0 ? <div className="px-3 py-2 text-sm">{emptyMessage}</div> : null}
+            {loading ? <div className="px-3 py-2 text-sm text-slate-600 dark:text-slate-300">Loading...</div> : null}
+            {!loading && options.length === 0 ? <div className="px-3 py-2 text-sm text-slate-600 dark:text-slate-300">{emptyMessage}</div> : null}
             {!loading
               ? options.map((option) => (
                   <button
                     key={option.value}
-                    className="block w-full rounded-xl px-3 py-2 text-left transition hover:bg-stone-100"
+                    className="block w-full rounded-xl px-3 py-2.5 text-left transition hover:bg-[rgba(22,55,159,0.05)] dark:text-white dark:hover:bg-white/10"
                     onMouseDown={(event) => {
                       event.preventDefault();
                       onOptionSelect(option);
@@ -206,8 +216,8 @@ export const AsyncCombobox = ({
                     role="option"
                     type="button"
                   >
-                    <div className="font-medium">{option.label}</div>
-                    {option.description ? <div className="text-xs text-stone-500">{option.description}</div> : null}
+                    <div className="font-medium text-slate-900 dark:text-white">{option.label}</div>
+                    {option.description ? <div className="text-xs text-slate-500 dark:text-slate-300">{option.description}</div> : null}
                   </button>
                 ))
               : null}

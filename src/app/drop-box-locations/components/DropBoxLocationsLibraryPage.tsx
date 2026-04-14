@@ -25,18 +25,20 @@ export const DropBoxLocationsLibraryPage = () => {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-10 md:px-8">
-      <section className="max-w-4xl">
-        <p className="text-sm uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+    <main className="app-shell">
+      <section className="app-hero">
+        <p className="app-kicker">
           Generated Layout Stress Test
         </p>
-        <h1 className="mt-3 text-5xl font-semibold leading-tight">Drop box locations use a generated card and form layout.</h1>
-        <p className="mt-4 text-lg" style={{ color: "var(--muted)" }}>
+        <h1 className="app-title">
+          Generated library primitives driving a real resource workflow.
+        </h1>
+        <p className="app-copy">
           This feature is meant to prove a lower-effort path: after Drizzle and Zod schemas exist, a developer mostly defines a typed resource profile.
         </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="app-actions">
           <button
-            className="rounded-full bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            className="app-primary-button"
             onClick={() => {
               setSelectedRecord(undefined);
               setPanelMode("create");
@@ -48,7 +50,7 @@ export const DropBoxLocationsLibraryPage = () => {
         </div>
       </section>
 
-      <section className="space-y-6">
+      <section className="app-card-stack">
         {locations.map((record) => (
           <ResourceCard
             key={record.locationId}

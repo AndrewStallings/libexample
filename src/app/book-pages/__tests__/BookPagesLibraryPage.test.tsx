@@ -2,7 +2,7 @@ import React from "react";
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { BookPagesLibraryPage } from "@/book-pages/components/BookPagesLibraryPage";
-import { getBookById } from "@/books/services/bookDemoService";
+import { getBookById } from "@/books/services/bookService";
 import { renderWithAppProviders } from "@/testing/renderWithAppProviders";
 
 vi.mock("next/link", () => {

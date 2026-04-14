@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export const cardActionClassName =
-  "rounded-xl border bg-white px-4 py-3 text-left text-sm font-semibold transition hover:bg-stone-50";
+  "rounded-xl border border-[color:var(--lib-action-button-border)] bg-[color:var(--lib-action-button-bg)] px-4 py-3 text-left text-sm font-medium text-[color:var(--lib-action-button-ink)] transition hover:bg-[color:var(--lib-action-button-hover)]";
 
 type CardActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { EntityId, UpdatedAtValue } from "../types/index";
+import { libPanelStyle } from "../styles";
 
 type FormFrameProps = {
   title: string;
@@ -37,30 +38,31 @@ export const FormFrame = ({ title, recordId, updatedBy, updatedAt, children, foo
 
   return (
     <section
-      className="rounded-3xl border p-6"
+      className="rounded-[1.75rem] border p-6 dark:text-white"
       style={{
-        borderColor: "var(--border)",
-        backgroundColor: "var(--surface)",
-        boxShadow: "0 20px 60px rgba(15, 23, 42, 0.08)",
+        ...libPanelStyle,
+        backgroundColor: "var(--lib-surface)",
+        boxShadow: "0 20px 48px rgba(15, 23, 42, 0.08)",
       }}
     >
-      <header className="mb-6 flex flex-col gap-3 border-b pb-4 md:flex-row md:items-end md:justify-between" style={{ borderColor: "var(--border)" }}>
+      <header className="mb-8 flex flex-col gap-4 border-b border-[color:var(--lib-border)] pb-5 dark:border-white/10 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold">{title}</h2>
+          <div className="mb-3 h-1 w-14 rounded-full bg-[color:var(--lib-primary)]" />
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">{title}</h2>
           {recordId !== undefined && recordId !== null ? (
-            <p className="text-sm" style={{ color: "var(--muted)" }}>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">
               ID: {String(recordId)}
             </p>
           ) : null}
         </div>
-        <div className="text-sm" style={{ color: "var(--muted)" }}>
+        <div className="grid gap-1 text-sm text-slate-500 dark:text-slate-300 md:text-right">
           {updatedBy ? <div>Last modified by {updatedBy}</div> : null}
           {updatedAtLabel ? <div>{updatedAtLabel}</div> : null}
         </div>
       </header>
 
       <div className="grid gap-4 md:grid-cols-2">{children}</div>
-      <div className="mt-6 flex justify-end">{footer}</div>
+      <div className="mt-8 flex justify-end border-t border-[color:var(--lib-border)] pt-5 dark:border-white/10">{footer}</div>
     </section>
   );
 };

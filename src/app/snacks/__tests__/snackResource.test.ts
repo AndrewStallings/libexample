@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { InMemoryAuditLogger } from "our-lib";
 import { initialSnacks } from "@/snacks/data/snackSeedData";
 import { snackResource } from "@/snacks/models/resource";
-import { createSnackRepository } from "@/snacks/services/snackDemoService";
+import { createSnackRepository } from "@/snacks/services/snackService";
 
 describe("snackResource", () => {
   it("maps seeded records into form input values", () => {

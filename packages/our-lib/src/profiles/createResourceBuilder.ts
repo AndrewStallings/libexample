@@ -1,6 +1,6 @@
-import type { ZodSafeParseResult, ZodType } from "zod";
+import type { ZodObject, ZodSafeParseResult } from "zod";
 import type { AuditLogger, RecordRepository, ResourceService } from "../dal/contracts";
-import { createRecordResource } from "../dal/createRecordResource";
+import { createWorkflowService } from "../dal/createWorkflowService";
 import type { EntityId, UpdatedAtValue } from "../types/index";
 import { defineResourceProfile, type ResourceCardField, type ResourceFormField, type ResourceProfile } from "./defineResourceProfile";
 
@@ -27,7 +27,7 @@ export type ValidatedResourceService<TRecord, TInput> = ResourceService<TRecord,
 export type ResourceBuilderConfig<TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown> = {
   entityName: string;
   route: string;
-  inputSchema: ZodType<TInput>;
+  inputSchema: ZodObject;
   drizzleTable?: TDrizzleTable;
   source?: string | undefined;
   displayName?: string | undefined;
@@ -139,28 +139,15 @@ const buildResourceResult = <TRecord, TInput extends Record<string, unknown>, TD
     repository: RecordRepository<TRecord, TInput, TInput>,
     logger: AuditLogger,
   ): ValidatedResourceService<TRecord, TInput> => {
-    const resource = createRecordResource({
+    return createWorkflowService({
       entityName: config.entityName,
       repository,
       logger,
       route: config.route,
       source: config.source ?? `${config.entityName}Service`,
       getEntityId: config.getRecordId,
+      inputSchema: config.inputSchema,
     });
-
-    return {
-      list: resource.list,
-      getById: resource.getById,
-      create: async (input, userId) => {
-        return resource.create(config.inputSchema.parse(input), userId);
-      },
-      update: async (id, input, userId) => {
-        return resource.update(id, config.inputSchema.parse(input), userId);
-      },
-      validate: (input) => {
-        return config.inputSchema.safeParse(input);
-      },
-    };
   };
 
   return {

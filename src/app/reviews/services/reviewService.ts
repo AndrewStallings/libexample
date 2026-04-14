@@ -1,34 +1,67 @@
 import { z } from "zod";
-import { createRecordResource, type AuditLogger, type RecordRepository } from "our-lib";
+import { createWorkflowService, type AuditLogger, type RecordRepository } from "our-lib";
+import { InMemoryReviewRepository, initialReviewRows } from "@/reviews/data/reviewRepository";
+import { reviewTypes, reviewerOptions } from "@/reviews/models/lookupData";
 import { reviewInputSchema, type ReviewInput, type ReviewRecord } from "@/reviews/models/schemas";
 
-export const createReviewService = (
+const repository = new InMemoryReviewRepository();
+
+const toReviewRecord = (row: (typeof initialReviewRows)[number]): ReviewRecord => {
+  const reviewType = reviewTypes.find((item) => item.reviewTypeId === row.reviewTypeId);
+  const reviewer = reviewerOptions.find((item) => item.value === row.reviewerId);
+
+  return {
+    reviewId: row.reviewId,
+    subject: row.subject,
+    reviewerId: row.reviewerId,
+    reviewerName: reviewer?.label ?? row.reviewerId,
+    reviewTypeId: row.reviewTypeId,
+    reviewTypeName: reviewType?.type ?? row.reviewTypeId,
+    rating: row.rating,
+    status: row.status,
+    summary: row.summary,
+    updatedAt: row.updatedAt,
+  };
+};
+
+export type ReviewService = {
+  repository: InMemoryReviewRepository;
+};
+
+export const createReviewService = () => {
+  return {
+    repository,
+  } satisfies ReviewService;
+};
+
+export const createReviewResourceService = (
   repository: RecordRepository<ReviewRecord, ReviewInput, ReviewInput>,
   logger: AuditLogger,
 ) => {
-  const resource = createRecordResource({
+  return createWorkflowService({
     entityName: "review",
     repository,
     logger,
     route: "/reviews",
     source: "reviewService",
     getEntityId: (record) => record.reviewId,
+    inputSchema: reviewInputSchema,
   });
+};
 
+export const getReviewById = (reviewId: string): ReviewRecord | undefined => {
+  const row = initialReviewRows.find((item) => item.reviewId === reviewId);
+  return row ? toReviewRecord(row) : undefined;
+};
+
+export const toReviewInput = (record?: ReviewRecord): ReviewInput => {
   return {
-    list: resource.list,
-    getById: resource.getById,
-    create: async (input: ReviewInput, userId: string) => {
-      const validated = reviewInputSchema.parse(input);
-      return resource.create(validated, userId);
-    },
-    update: async (id: string, input: ReviewInput, userId: string) => {
-      const validated = reviewInputSchema.parse(input);
-      return resource.update(id, validated, userId);
-    },
-    validate: (input: ReviewInput) => {
-      return reviewInputSchema.safeParse(input);
-    },
+    subject: record?.subject ?? "",
+    reviewerId: record?.reviewerId ?? "u-01",
+    reviewTypeId: record?.reviewTypeId ?? "rt-01",
+    rating: record?.rating ?? 3,
+    status: record?.status ?? "open",
+    summary: record?.summary ?? "",
   };
 };
 

@@ -1,12 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
 import { ReviewFormPage } from "@/reviews/components/ReviewFormPage";
 import type { ReviewRecord } from "@/reviews/models/schemas";
 import { reviewTypes, reviewerOptions } from "@/reviews/models/lookupData";
-import { listReviews } from "@/reviews/services/reviewDemoService";
+import { createReviewService } from "@/reviews/services/reviewService";
 
 export const REVIEWS_QUERY_KEY = "reviews";
 
@@ -23,16 +23,13 @@ const formatStatus = (status: string) => {
 };
 
 export const ReviewsLibraryPage = () => {
+  const service = useMemo(() => createReviewService(), []);
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<ReviewRecord | undefined>();
   const { data: reviews = [] } = useQuery({
     queryKey: [REVIEWS_QUERY_KEY],
-    queryFn: listReviews,
+    queryFn: async () => (await service.repository.list()).items,
   });
-
-  const createButtonStyle = {
-    backgroundColor: "var(--accent)",
-  } as const;
 
   const closePanel = () => {
     setPanelMode(null);
@@ -40,24 +37,23 @@ export const ReviewsLibraryPage = () => {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-10 md:px-8">
-      <section className="max-w-4xl">
-        <p className="text-sm uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+    <main className="app-shell">
+      <section className="app-hero">
+        <p className="app-kicker">
           Second Feature
         </p>
-        <h1 className="mt-3 text-5xl font-semibold leading-tight">Reviews pressure-test the pattern against joined lookup data.</h1>
-        <p className="mt-4 text-lg" style={{ color: "var(--muted)" }}>
+        <h1 className="app-title">Reviews pressure-test the pattern against joined lookup data.</h1>
+        <p className="app-copy">
           The base review table has eight columns, and <code>ReviewTypeID</code> joins to a type lookup table. The UI still consumes a clean,
           enriched record shape.
         </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="app-actions">
           <button
-            className="rounded-full px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            className="app-primary-button"
             onClick={() => {
               setSelectedRecord(undefined);
               setPanelMode("create");
             }}
-            style={createButtonStyle}
             type="button"
           >
             Create Review
@@ -65,7 +61,7 @@ export const ReviewsLibraryPage = () => {
         </div>
       </section>
 
-      <section className="space-y-6">
+      <section className="app-card-stack">
         {reviews.map((record) => (
           <EntityCard
             key={record.reviewId}
