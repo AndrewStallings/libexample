@@ -12,7 +12,7 @@ class ServerDbAuditLogger implements AuditLogger {
   private loggerPromise: Promise<AuditLogger> | null = null;
 
   private getLogger = async () => {
-    this.loggerPromise ??= import("@/config/appDb").then(({ getAppDb }) => {
+    this.loggerPromise ??= import("./appDb").then(({ getAppDb }) => {
       return new DbAuditLogger(getAppDb().auditLogs);
     });
 
