@@ -1,14 +1,14 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { datetime2, int, mssqlTable, nvarchar } from "drizzle-orm/mssql-core";
 
-export const auditLogTable = pgTable("AuditLog", {
-  auditLogId: text("AuditLogID").primaryKey(),
-  server: text("Server").notNull(),
-  shortNote: text("ShortNote").notNull(),
-  longNote: text("LongNote"),
-  time: timestamp("Time", { withTimezone: false }).notNull(),
-  source: text("Source").notNull(),
-  category: text("Category").notNull(),
-  severity: text("Severity").notNull(),
-  route: text("Route").notNull(),
-  userId: text("UserID").notNull(),
+export const auditLogTable = mssqlTable("AuditLog", {
+  auditLogId: int("AuditLogID").identity().primaryKey(),
+  server: nvarchar("Server", { length: 128 }).notNull(),
+  shortNote: nvarchar("ShortNote", { length: 255 }).notNull(),
+  longNote: nvarchar("LongNote", { length: "max" }),
+  time: datetime2("Time").notNull(),
+  source: nvarchar("Source", { length: 255 }).notNull(),
+  category: nvarchar("Category", { length: 128 }).notNull(),
+  severity: nvarchar("Severity", { length: 32 }).notNull(),
+  route: nvarchar("Route", { length: 255 }).notNull(),
+  userId: nvarchar("UserID", { length: 255 }).notNull(),
 });

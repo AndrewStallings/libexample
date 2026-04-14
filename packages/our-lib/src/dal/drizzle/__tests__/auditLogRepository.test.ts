@@ -16,7 +16,7 @@ describe("auditLogRepository", () => {
             insertedRow = row;
 
             return {
-              returning: async () => [{ auditLogId: "log-1001" }],
+              output: async () => [{ auditLogId: 1001 }],
             };
           },
         };
@@ -38,11 +38,10 @@ describe("auditLogRepository", () => {
       time: "2026-04-09T12:00:00.000Z",
     });
 
-    expect(auditLogId).toBe("log-1001");
+    expect(auditLogId).toBe(1001);
     expect(insertedTable).toBe(auditLogTable);
     expect(insertedRow).toEqual(
       expect.objectContaining({
-        auditLogId: expect.any(String),
         shortNote: "book created",
         time: new Date("2026-04-09T12:00:00.000Z"),
       }),
@@ -65,7 +64,7 @@ describe("auditLogRepository", () => {
 
             return {
               where: () => ({
-                returning: async () => [{ auditLogId: "log-1002" }],
+                output: async () => [{ auditLogId: 1002 }],
               }),
             };
           },
@@ -73,13 +72,13 @@ describe("auditLogRepository", () => {
       },
     };
 
-    const auditLogId = await updateAuditLog(db, "log-1002", {
+    const auditLogId = await updateAuditLog(db, 1002, {
       shortNote: "book updated",
       severity: "warn",
       time: "2026-04-09T12:15:00.000Z",
     });
 
-    expect(auditLogId).toBe("log-1002");
+    expect(auditLogId).toBe(1002);
     expect(updatedValues).toEqual({
       shortNote: "book updated",
       severity: "warn",

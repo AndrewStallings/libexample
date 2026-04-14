@@ -1,6 +1,5 @@
 import type { ZodObject, ZodSafeParseResult } from "zod";
-import type { AuditLogger, RecordRepository } from "./contracts";
-import { buildAuditEntry } from "./logging";
+import type { AuditLogEntry, AuditLogger, RecordRepository } from "./contracts";
 import type { EntityId } from "../types/index";
 
 type WorkflowServiceConfig<TRecord, TCreateInput extends Record<string, unknown>, TUpdateInput extends Record<string, unknown>> = {
@@ -17,6 +16,16 @@ const getErrorMessage = (error: unknown) => {
   return error instanceof Error ? error.message : String(error);
 };
 
+const createAuditLogEntry = (
+  partial: Omit<AuditLogEntry, "time" | "severity"> & Partial<Pick<AuditLogEntry, "time" | "severity">>,
+): AuditLogEntry => {
+  return {
+    ...partial,
+    severity: partial.severity ?? "info",
+    time: partial.time ?? new Date().toISOString(),
+  };
+};
+
 export const createWorkflowService = <
   TRecord,
   TCreateInput extends Record<string, unknown>,
@@ -28,7 +37,7 @@ export const createWorkflowService = <
 
   const writeFailureLog = async (operation: "create" | "update", userId: string, error: unknown) => {
     await logger.write(
-      buildAuditEntry({
+      createAuditLogEntry({
         server: "local",
         severity: "error",
         shortNote: `${entityName} ${operation} failed`,
@@ -84,7 +93,7 @@ export const createWorkflowService = <
       }
 
       await logger.write(
-        buildAuditEntry({
+        createAuditLogEntry({
           server: "local",
           shortNote: `${entityName} created`,
           longNote: `${entityName} ${getEntityId(created)} was created`,
@@ -119,7 +128,7 @@ export const createWorkflowService = <
       }
 
       await logger.write(
-        buildAuditEntry({
+        createAuditLogEntry({
           server: "local",
           shortNote: `${entityName} updated`,
           longNote: `${entityName} ${id} was updated`,

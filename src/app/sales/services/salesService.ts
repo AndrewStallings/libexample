@@ -1,7 +1,17 @@
-import { buildAuditEntry, type AuditLogger } from "our-lib";
+import type { AuditLogEntry, AuditLogger } from "our-lib";
 import { createSalesValidator, defaultSalesValidator, type SalesValidationOverride } from "@/sales/logic/rules";
 import type { SalesRepository } from "@/sales/data/salesRepository";
 import type { SaleDeleteReason, SaleInput, SaleRecord, SaleRevision } from "@/sales/models/schemas";
+
+const createAuditLogEntry = (
+  partial: Omit<AuditLogEntry, "time" | "severity"> & Partial<Pick<AuditLogEntry, "time" | "severity">>,
+): AuditLogEntry => {
+  return {
+    ...partial,
+    severity: partial.severity ?? "info",
+    time: partial.time ?? new Date().toISOString(),
+  };
+};
 
 export const createSalesService = (
   repository: SalesRepository,
@@ -17,7 +27,7 @@ export const createSalesService = (
     }
     const created = await repository.createSale(parsed.data, userName);
     await logger.write(
-      buildAuditEntry({
+      createAuditLogEntry({
         server: "local",
         shortNote: "sale created",
         longNote: `Sale ${created.saleId} was created`,
@@ -44,7 +54,7 @@ export const createSalesService = (
       }
       const updated = await repository.updateSale(saleId, parsed.data, userName);
       await logger.write(
-        buildAuditEntry({
+        createAuditLogEntry({
           server: "local",
           shortNote: "sale updated",
           longNote: `Sale ${updated.saleId} was updated`,
@@ -59,7 +69,7 @@ export const createSalesService = (
     delete: async (saleId: string, reason: string, userName: string) => {
       const result = await repository.deleteSale(saleId, reason, userName);
       await logger.write(
-        buildAuditEntry({
+        createAuditLogEntry({
           server: "local",
           shortNote: "sale deleted",
           longNote: `Sale ${saleId} was deleted`,

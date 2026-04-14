@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAuditEntry, InMemoryAuditLogger, InMemoryLogger } from "../logging";
+import { DrizzleAuditLogger, InMemoryAuditLogger, InMemoryLogger } from "../logging";
 
 describe("logging helpers", () => {
   it("stores generic entries in memory", async () => {
@@ -14,32 +14,59 @@ describe("logging helpers", () => {
   it("stores audit entries in memory", async () => {
     const logger = new InMemoryAuditLogger();
 
-    await logger.write(
-      buildAuditEntry({
-        server: "local",
-        shortNote: "audit written",
-        source: "logging.test",
-        category: "audit",
-        route: "/audit",
-        userId: "test-user",
-      }),
-    );
+    await logger.write({
+      server: "local",
+      shortNote: "audit written",
+      source: "logging.test",
+      category: "audit",
+      route: "/audit",
+      userId: "test-user",
+      severity: "info",
+      time: "2026-04-14T12:00:00.000Z",
+    });
 
     expect(logger.entries).toHaveLength(1);
     expect(logger.entries[0]?.shortNote).toBe("audit written");
   });
 
-  it("keeps the audit helper behavior intact", () => {
-    const entry = buildAuditEntry({
-      server: "local",
+  it("writes audit entries through the drizzle audit log repository", async () => {
+    let insertedValues: unknown;
+
+    const db = {
+      insert: () => ({
+        values: (values: unknown) => {
+          insertedValues = values;
+
+          return {
+            output: async () => [{ auditLogId: 101 }],
+          };
+        },
+      }),
+      update: () => {
+        throw new Error("update should not be called in this test");
+      },
+    };
+
+    const logger = new DrizzleAuditLogger(db);
+
+    await logger.write({
+      server: "sql-01",
       shortNote: "audit created",
+      longNote: "Workflow WF-1001 completed",
       source: "logging.test",
       category: "audit",
       route: "/audit",
       userId: "test-user",
+      severity: "info",
+      time: "2026-04-14T12:30:00.000Z",
     });
 
-    expect(entry.severity).toBe("info");
-    expect(entry.time).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(insertedValues).toEqual(
+      expect.objectContaining({
+        server: "sql-01",
+        shortNote: "audit created",
+        time: new Date("2026-04-14T12:30:00.000Z"),
+      }),
+    );
   });
 });
