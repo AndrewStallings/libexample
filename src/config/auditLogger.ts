@@ -1,4 +1,5 @@
-import { InMemoryAuditLogger, type AuditLogger } from "our-lib";
+import { DbAuditLogger, InMemoryAuditLogger, type AuditLogger } from "our-lib";
+import { getAppAuditLogDb } from "@/config/auditLogDb";
 
 const isUnitTestEnvironment = () => {
   return process.env.NODE_ENV === "test" || process.env.VITEST === "true";
@@ -9,7 +10,5 @@ export const createAppAuditLogger = (): AuditLogger => {
     return new InMemoryAuditLogger();
   }
 
-  // Keep runtime logging behind a single app-level seam.
-  // This can later switch to a DB-backed logger without touching service code.
-  return new InMemoryAuditLogger();
+  return new DbAuditLogger(getAppAuditLogDb());
 };

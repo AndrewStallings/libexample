@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DrizzleAuditLogger, InMemoryAuditLogger, InMemoryLogger } from "../logging";
+import { DbAuditLogger, InMemoryAuditLogger, InMemoryLogger } from "../logging";
 
 describe("logging helpers", () => {
   it("stores generic entries in memory", async () => {
@@ -47,7 +47,7 @@ describe("logging helpers", () => {
       },
     };
 
-    const logger = new DrizzleAuditLogger(db);
+    const logger = new DbAuditLogger(db);
 
     await logger.write({
       server: "sql-01",

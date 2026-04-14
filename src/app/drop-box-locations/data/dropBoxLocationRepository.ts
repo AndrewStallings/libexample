@@ -80,7 +80,7 @@ export class InMemoryDropBoxLocationRepository implements RecordRepository<DropB
       updatedAt: new Date().toISOString(),
       updatedBy: validated.districtManager,
     };
-
+    
     this.items = this.items.map((item) => (item.locationId === id ? updated : item));
     return updated;
   };

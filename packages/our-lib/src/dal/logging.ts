@@ -11,7 +11,7 @@ export class InMemoryLogger<TEntry> implements Logger<TEntry> {
 
 export class InMemoryAuditLogger extends InMemoryLogger<AuditLogEntry> implements AuditLogger {}
 
-export class DrizzleAuditLogger implements AuditLogger {
+export class DbAuditLogger implements AuditLogger {
   constructor(private readonly db: AuditLogDb) {}
 
   write = async (entry: AuditLogEntry): Promise<void> => {

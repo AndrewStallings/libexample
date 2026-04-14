@@ -1,3 +1,4 @@
+import { createAppAuditLogger } from "@/config/auditLogger";
 import type { AsyncComboboxOption } from "our-lib";
 
 const supplierOptions: AsyncComboboxOption[] = [
@@ -13,7 +14,6 @@ export const loadSnackSupplierOptions = async (query: string): Promise<AsyncComb
   if (!normalizedQuery) {
     return supplierOptions;
   }
-
   return supplierOptions.filter((option) => {
     return option.label.toLowerCase().includes(normalizedQuery) || option.description?.toLowerCase().includes(normalizedQuery);
   });
