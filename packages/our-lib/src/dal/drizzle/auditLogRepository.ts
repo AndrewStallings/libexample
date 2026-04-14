@@ -1,22 +1,30 @@
 import { eq } from "drizzle-orm";
-import type { InferInsertModel } from "drizzle-orm";
 import { auditLogTable } from "./schema/auditLog";
 
-type AuditLogInsertRow = InferInsertModel<typeof auditLogTable>;
+type AuditLogDbRow = {
+  auditLogId: number;
+  server: string;
+  shortNote: string;
+  longNote?: string | null | undefined;
+  time: Date;
+  source: string;
+  category: string;
+  severity: string;
+  route: string;
+  userId: string;
+};
+
+type AuditLogInsertRow = Omit<AuditLogDbRow, "auditLogId">;
+export type AuditLogRow = AuditLogDbRow;
 
 export type AuditLogDb = {
-  insert: (table: typeof auditLogTable) => {
-    values: (values: AuditLogInsertRow) => {
-      output: (selection: unknown) => Promise<Array<{ auditLogId: number }>>;
-    };
-  };
-  update: (table: typeof auditLogTable) => {
-    set: (values: Partial<AuditLogInsertRow>) => {
-      where: (condition: ReturnType<typeof eq>) => {
-        output: (selection: unknown) => Promise<Array<{ auditLogId: number }>>;
-      };
-    };
-  };
+  insert: (table: any) => any;
+  update: (table: any) => any;
+};
+
+export type InMemoryAuditLogDb = AuditLogDb & {
+  getRows: () => AuditLogRow[];
+  reset: () => void;
 };
 
 export type AuditLogWriteInput = Omit<AuditLogInsertRow, "auditLogId" | "time"> & {
@@ -45,7 +53,7 @@ const toAuditLogUpdateRow = (input: AuditLogUpdateInput): Partial<AuditLogInsert
 
 export const insertAuditLog = async (db: AuditLogDb, input: AuditLogWriteInput): Promise<number> => {
   const row = toAuditLogRow(input);
-  const [created] = await db.insert(auditLogTable).values(row).output({ auditLogId: auditLogTable.auditLogId });
+  const [created] = await db.insert(auditLogTable).output({ auditLogId: auditLogTable.auditLogId }).values(row);
 
   if (!created) {
     throw new Error("Failed to insert audit log.");
@@ -66,4 +74,54 @@ export const updateAuditLog = async (db: AuditLogDb, auditLogId: number, input: 
   }
 
   return updated.auditLogId;
+};
+
+export const createInMemoryAuditLogDb = (): InMemoryAuditLogDb => {
+  const rows: AuditLogRow[] = [];
+  let nextAuditLogId = 1;
+
+  return {
+    insert: () => ({
+      output: () => ({
+        values: async (values: AuditLogInsertRow) => {
+          const row: AuditLogRow = {
+            auditLogId: nextAuditLogId++,
+            server: values.server,
+            shortNote: values.shortNote,
+            longNote: values.longNote ?? null,
+            time: values.time,
+            source: values.source,
+            category: values.category,
+            severity: values.severity,
+            route: values.route,
+            userId: values.userId,
+          };
+
+          rows.push(row);
+          return [{ auditLogId: row.auditLogId }];
+        },
+      }),
+    }),
+    update: () => ({
+      set: (values: Partial<AuditLogInsertRow>) => ({
+        where: () => ({
+          output: async () => {
+            const currentRow = rows.at(-1);
+
+            if (!currentRow) {
+              return [];
+            }
+
+            Object.assign(currentRow, values);
+            return [{ auditLogId: currentRow.auditLogId }];
+          },
+        }),
+      }),
+    }),
+    getRows: () => [...rows],
+    reset: () => {
+      rows.length = 0;
+      nextAuditLogId = 1;
+    },
+  };
 };

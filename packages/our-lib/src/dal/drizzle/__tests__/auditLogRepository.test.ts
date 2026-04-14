@@ -12,13 +12,12 @@ describe("auditLogRepository", () => {
         insertedTable = table;
 
         return {
-          values: (row: unknown) => {
-            insertedRow = row;
-
-            return {
-              output: async () => [{ auditLogId: 1001 }],
-            };
-          },
+          output: () => ({
+            values: async (row: unknown) => {
+              insertedRow = row;
+              return [{ auditLogId: 1001 }];
+            },
+          }),
         };
       },
       update: () => {

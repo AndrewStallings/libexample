@@ -4,6 +4,9 @@ import { createWorkflowService } from "../dal/createWorkflowService";
 import type { EntityId, UpdatedAtValue } from "../types/index";
 import { defineResourceProfile, type ResourceCardField, type ResourceFormField, type ResourceProfile } from "./defineResourceProfile";
 
+type ResourceInput = Record<string, unknown>;
+type InputSchema = ZodObject;
+
 const humanizeWords = (value: string) => {
   return value
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
@@ -24,30 +27,52 @@ export type ValidatedResourceService<TRecord, TInput> = ResourceService<TRecord,
   validate: (input: TInput) => ZodSafeParseResult<TInput>;
 };
 
-export type ResourceBuilderConfig<TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown> = {
-  entityName: string;
-  route: string;
-  inputSchema: ZodObject;
-  drizzleTable?: TDrizzleTable;
-  source?: string | undefined;
+type ResourceProfileOverrides<TRecord, TInput extends ResourceInput> = {
+  getFormTitle?: ResourceProfile<TRecord, TInput>["getFormTitle"] | undefined;
+  getSubmitLabel?: ResourceProfile<TRecord, TInput>["getSubmitLabel"] | undefined;
+};
+
+type ResourceIdentityConfig<TRecord> = {
+  getRecordId: (record: TRecord) => EntityId;
+  getRecordLabel?: ((record: TRecord) => string | undefined) | undefined;
+  getUpdatedAt?: ((record: TRecord) => UpdatedAtValue | undefined) | undefined;
+  getUpdatedBy?: ((record: TRecord) => string | undefined) | undefined;
+};
+
+type ResourceDisplayConfig<TRecord, TInput extends ResourceInput> = ResourceProfileOverrides<TRecord, TInput> & {
   displayName?: string | undefined;
   entityLabel?: string | undefined;
   collectionName?: string | undefined;
   backHref?: string | undefined;
   backLabel?: string | undefined;
-  getRecordId: (record: TRecord) => EntityId;
-  getRecordLabel?: ((record: TRecord) => string | undefined) | undefined;
-  getUpdatedAt?: ((record: TRecord) => UpdatedAtValue | undefined) | undefined;
-  getUpdatedBy?: ((record: TRecord) => string | undefined) | undefined;
-  getFormTitle?: ResourceProfile<TRecord, TInput>["getFormTitle"] | undefined;
-  getSubmitLabel?: ResourceProfile<TRecord, TInput>["getSubmitLabel"] | undefined;
+};
+
+type ResourceDefaultsConfig<TRecord, TInput extends ResourceInput> = {
   createEmptyInput: () => TInput;
   mapRecordToInput?: ((record: TRecord) => TInput) | undefined;
+};
+
+type ResourceFieldsConfig<TRecord, TInput extends ResourceInput> = {
   cardFields: ResourceCardField<TRecord>[];
   formFields: ResourceFormField<TInput>[];
 };
 
-export type ResourceBuilderResult<TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown> = {
+type ResourceCoreConfig<TDrizzleTable = unknown> = {
+  entityName: string;
+  route: string;
+  inputSchema: InputSchema;
+  drizzleTable?: TDrizzleTable | undefined;
+  source?: string | undefined;
+};
+
+export type ResourceBuilderConfig<TRecord, TInput extends ResourceInput, TDrizzleTable = unknown> =
+  & ResourceCoreConfig<TDrizzleTable>
+  & ResourceIdentityConfig<TRecord>
+  & ResourceDisplayConfig<TRecord, TInput>
+  & ResourceDefaultsConfig<TRecord, TInput>
+  & ResourceFieldsConfig<TRecord, TInput>;
+
+export type ResourceBuilderResult<TRecord, TInput extends ResourceInput, TDrizzleTable = unknown> = {
   entityName: string;
   route: string;
   drizzleTable?: TDrizzleTable | undefined;
@@ -66,27 +91,13 @@ export type ResourceBuilderResult<TRecord, TInput extends Record<string, unknown
   ) => ValidatedResourceService<TRecord, TInput>;
 };
 
-type ResourceIdentityConfig<TRecord> = Pick<
-  ResourceBuilderConfig<TRecord, Record<string, unknown>>,
-  "getRecordId" | "getRecordLabel" | "getUpdatedAt" | "getUpdatedBy"
+type ResourceBuilderState<TRecord, TInput extends ResourceInput, TDrizzleTable> = Partial<
+  ResourceBuilderConfig<TRecord, TInput, TDrizzleTable>
 >;
 
-type ResourceDisplayConfig<TRecord, TInput extends Record<string, unknown>> = Pick<
-  ResourceBuilderConfig<TRecord, TInput>,
-  "displayName" | "entityLabel" | "collectionName" | "backHref" | "backLabel" | "getFormTitle" | "getSubmitLabel"
->;
+type ResourceBuilderResourceConfig<TDrizzleTable = unknown> = ResourceCoreConfig<TDrizzleTable>;
 
-type ResourceDefaultsConfig<TRecord, TInput extends Record<string, unknown>> = Pick<
-  ResourceBuilderConfig<TRecord, TInput>,
-  "createEmptyInput" | "mapRecordToInput"
->;
-
-type ResourceFieldsConfig<TRecord, TInput extends Record<string, unknown>> = Pick<
-  ResourceBuilderConfig<TRecord, TInput>,
-  "cardFields" | "formFields"
->;
-
-const buildResourceResult = <TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown>(
+const buildResourceResult = <TRecord, TInput extends ResourceInput, TDrizzleTable = unknown>(
   config: ResourceBuilderConfig<TRecord, TInput, TDrizzleTable>,
 ): ResourceBuilderResult<TRecord, TInput, TDrizzleTable> => {
   const displayName = config.displayName ?? humanizeWords(config.entityName);
@@ -167,19 +178,17 @@ const buildResourceResult = <TRecord, TInput extends Record<string, unknown>, TD
   };
 };
 
-export class ResourceBuilder<TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown> {
-  constructor(private readonly config: Partial<ResourceBuilderConfig<TRecord, TInput, TDrizzleTable>> = {}) {}
+export class ResourceBuilder<TRecord, TInput extends ResourceInput, TDrizzleTable = unknown> {
+  constructor(private readonly config: ResourceBuilderState<TRecord, TInput, TDrizzleTable> = {}) {}
 
-  private next(updates: Partial<ResourceBuilderConfig<TRecord, TInput, TDrizzleTable>>) {
+  private next(updates: ResourceBuilderState<TRecord, TInput, TDrizzleTable>) {
     return new ResourceBuilder<TRecord, TInput, TDrizzleTable>({
       ...this.config,
       ...updates,
     });
   }
 
-  resource(
-    value: Pick<ResourceBuilderConfig<TRecord, TInput, TDrizzleTable>, "entityName" | "route" | "inputSchema" | "drizzleTable" | "source">,
-  ) {
+  resource(value: ResourceBuilderResourceConfig<TDrizzleTable>) {
     return this.next(value);
   }
 
@@ -227,15 +236,15 @@ export class ResourceBuilder<TRecord, TInput extends Record<string, unknown>, TD
   }
 }
 
-export function createResourceBuilder<TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown>(): ResourceBuilder<
+export function createResourceBuilder<TRecord, TInput extends ResourceInput, TDrizzleTable = unknown>(): ResourceBuilder<
   TRecord,
   TInput,
   TDrizzleTable
 >;
-export function createResourceBuilder<TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown>(
+export function createResourceBuilder<TRecord, TInput extends ResourceInput, TDrizzleTable = unknown>(
   config: ResourceBuilderConfig<TRecord, TInput, TDrizzleTable>,
 ): ResourceBuilderResult<TRecord, TInput, TDrizzleTable>;
-export function createResourceBuilder<TRecord, TInput extends Record<string, unknown>, TDrizzleTable = unknown>(
+export function createResourceBuilder<TRecord, TInput extends ResourceInput, TDrizzleTable = unknown>(
   config?: ResourceBuilderConfig<TRecord, TInput, TDrizzleTable>,
 ) {
   if (config) {

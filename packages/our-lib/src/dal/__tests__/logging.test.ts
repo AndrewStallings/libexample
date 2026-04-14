@@ -34,13 +34,12 @@ describe("logging helpers", () => {
 
     const db = {
       insert: () => ({
-        values: (values: unknown) => {
-          insertedValues = values;
-
-          return {
-            output: async () => [{ auditLogId: 101 }],
-          };
-        },
+        output: () => ({
+          values: async (values: unknown) => {
+            insertedValues = values;
+            return [{ auditLogId: 101 }];
+          },
+        }),
       }),
       update: () => {
         throw new Error("update should not be called in this test");
