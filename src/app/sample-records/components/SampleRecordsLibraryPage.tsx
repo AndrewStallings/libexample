@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
@@ -27,6 +28,11 @@ export const SampleRecordsLibraryPage = () => {
           This example keeps the repository focused on a single table and lets the service add one higher-level helper while the page renders
           EntityCard directly.
         </p>
+        <div className="app-actions">
+          <Link className="app-primary-button" href="/sample-records/new">
+            Create Record
+          </Link>
+        </div>
       </section>
 
       <section className="app-card-stack">
@@ -52,9 +58,9 @@ export const SampleRecordsLibraryPage = () => {
             ]}
             actions={
               <>
-                <button className={cardActionClassName} type="button">
+                <Link className={cardActionClassName} href={`/sample-records/${record.sampleRecordId}`}>
                   Open Record
-                </button>
+                </Link>
                 <CardActionButton>Review Activity</CardActionButton>
               </>
             }

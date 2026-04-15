@@ -1,8 +1,4 @@
-import {
-  createWorkflowService,
-  InMemoryAuditLogger,
-  type AuditLogEntry,
-} from "our-lib";
+import { createWorkflowService, InMemoryAuditLogger, type AuditLogEntry } from "our-lib";
 import { createSampleRecordRepository } from "@/app/sample-records/data/sampleRecordRepository";
 import { sampleRecordInputSchema } from "@/app/sample-records/models/schemas";
 import type { SampleRecord, SampleRecordInput } from "@/app/sample-records/models/schemas";
@@ -11,9 +7,10 @@ const isAttentionReadyRecord = (record: SampleRecord) => {
   return record.status === "active" && record.notes.toLowerCase().includes("active");
 };
 
+let repository = createSampleRecordRepository();
+let logger = new InMemoryAuditLogger();
+
 export const createSampleRecordService = () => {
-  const repository = createSampleRecordRepository();
-  const logger = new InMemoryAuditLogger();
   const resource = createWorkflowService({
     entityName: "sampleRecord",
     repository,
@@ -45,4 +42,15 @@ export const createSampleRecordService = () => {
       };
     },
   };
+};
+
+export type SampleRecordService = ReturnType<typeof createSampleRecordService>;
+
+export const getSampleRecordById = async (sampleRecordId: string) => {
+  return repository.getById(sampleRecordId);
+};
+
+export const resetSampleRecordService = () => {
+  repository = createSampleRecordRepository();
+  logger = new InMemoryAuditLogger();
 };

@@ -1,7 +1,11 @@
-import { describe, expect, it } from "vitest";
-import { createSampleRecordService } from "@/app/sample-records/services/sampleRecordService";
+import { beforeEach, describe, expect, it } from "vitest";
+import { createSampleRecordService, resetSampleRecordService } from "@/app/sample-records/services/sampleRecordService";
 
 describe("createSampleRecordService", () => {
+  beforeEach(() => {
+    resetSampleRecordService();
+  });
+
   it("creates a record and writes an audit log entry", async () => {
     const service = createSampleRecordService();
 
