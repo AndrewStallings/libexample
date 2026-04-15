@@ -1,34 +1,17 @@
-import { DbAuditLogger, InMemoryAuditLogger, type AuditLogger, type AuditLogEntry } from "our-lib";
+import "server-only";
 
-const isUnitTestEnvironment = () => {
-  return process.env.NODE_ENV === "test" || process.env.VITEST === "true";
+import { DbAuditLogger, type AuditLogger } from "our-lib";
+import { getAppDb } from "@/config/appDb";
+import { createInMemoryAuditLogger } from "@/config/inMemoryAuditLogger";
+
+const shouldUseDbAuditLogger = () => {
+  return process.env.NODE_ENV === "production";
 };
-
-const isBrowserEnvironment = () => {
-  return typeof window !== "undefined";
-};
-
-class ServerDbAuditLogger implements AuditLogger {
-  private loggerPromise: Promise<AuditLogger> | null = null;
-
-  private getLogger = async () => {
-    this.loggerPromise ??= import("./appDb").then(({ getAppDb }) => {
-      return new DbAuditLogger(getAppDb().auditLogs);
-    });
-
-    return this.loggerPromise;
-  };
-
-  write = async (entry: AuditLogEntry) => {
-    const logger = await this.getLogger();
-    await logger.write(entry);
-  };
-}
 
 export const createAppAuditLogger = (): AuditLogger => {
-  if (isUnitTestEnvironment() || isBrowserEnvironment()) {
-    return new InMemoryAuditLogger();
+  if (!shouldUseDbAuditLogger()) {
+    return createInMemoryAuditLogger();
   }
 
-  return new ServerDbAuditLogger();
+  return new DbAuditLogger(getAppDb().auditLogs);
 };

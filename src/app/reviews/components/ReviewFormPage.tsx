@@ -1,9 +1,10 @@
 "use client";
 
 import { FormShell, useSidePanelFormState } from "our-lib";
+import { createReviewAction, updateReviewAction } from "@/reviews/actions";
 import { ReviewForm } from "@/reviews/components/ReviewForm";
 import { REVIEWS_QUERY_KEY } from "@/reviews/components/ReviewsLibraryPage";
-import { createReviewService, toReviewInput } from "@/reviews/services/reviewService";
+import { toReviewInput } from "@/reviews/models/toReviewInput";
 import type { ReviewRecord } from "@/reviews/models/schemas";
 import { useMemo } from "react";
 
@@ -15,9 +16,15 @@ type ReviewFormPageProps = {
 };
 
 export const ReviewFormPage = ({ mode, record, isOpen = true, onClose }: ReviewFormPageProps) => {
-  const service = useMemo(() => createReviewService(), []);
+  const service = useMemo(
+    () => ({
+      create: createReviewAction,
+      update: updateReviewAction,
+    }),
+    [],
+  );
   const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<
-    ReturnType<typeof createReviewService>,
+    typeof service,
     ReviewRecord,
     ReturnType<typeof toReviewInput>
   >({
@@ -27,8 +34,8 @@ export const ReviewFormPage = ({ mode, record, isOpen = true, onClose }: ReviewF
     onClose,
     createService: () => service,
     queryKey: [REVIEWS_QUERY_KEY],
-    createRecord: (serviceValue, input) => serviceValue.repository.create(input),
-    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.repository.update(currentRecordValue.reviewId, input),
+    createRecord: (serviceValue, input) => serviceValue.create(input),
+    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.update(currentRecordValue.reviewId, input),
     getRecordId: (currentRecordValue) => currentRecordValue.reviewId,
     entityLabel: "review",
   });

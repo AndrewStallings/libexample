@@ -1,7 +1,10 @@
 import { SnacksLibraryPage } from "@/snacks/components/SnacksLibraryPage";
+import { listSnacks } from "@/snacks/services/snackService";
 
-const SnacksPage = () => {
-  return <SnacksLibraryPage />;
+const SnacksPage = async () => {
+  const initialSnacks = await listSnacks();
+
+  return <SnacksLibraryPage initialSnacks={initialSnacks} />;
 };
 
 export default SnacksPage;

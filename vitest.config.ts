@@ -17,6 +17,7 @@ export default defineConfig({
       "@/config": path.resolve(__dirname, "./src/config"),
       "@/testing": path.resolve(__dirname, "./src/testing"),
       "our-lib": path.resolve(__dirname, "./packages/our-lib/src/index.ts"),
+      "server-only": path.resolve(__dirname, "./src/testing/serverOnly.ts"),
     },
   },
   test: {

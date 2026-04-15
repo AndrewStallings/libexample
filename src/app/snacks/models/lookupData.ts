@@ -1,4 +1,3 @@
-import { createAppAuditLogger } from "@/config/auditLogger";
 import type { AsyncComboboxOption } from "our-lib";
 
 const supplierOptions: AsyncComboboxOption[] = [

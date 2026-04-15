@@ -5,7 +5,7 @@ import { canViewSalesTracker } from "@/sales/logic/rules";
 import { InMemorySalesRepository, initialSales } from "@/sales/data/salesRepository";
 import type { SaleInput, SaleRecord, SaleRevision, SalesUser } from "@/sales/models/schemas";
 import { createSalesService } from "@/sales/services/salesService";
-import { createAppAuditLogger } from "@/config/auditLogger";
+import { createInMemoryAuditLogger } from "@/config/inMemoryAuditLogger";
 import { subscribeToRecordMutations } from "@/config/recordMutations";
 
 const currentUser: SalesUser = {
@@ -14,7 +14,7 @@ const currentUser: SalesUser = {
 };
 
 const repository = new InMemorySalesRepository();
-const logger = createAppAuditLogger();
+const logger = createInMemoryAuditLogger();
 const service = createSalesService(repository, logger);
 
 type SalesDemoState = {

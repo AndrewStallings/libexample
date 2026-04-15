@@ -1,5 +1,6 @@
 export * from "./defineResourceProfile";
 export * from "./createResourceBuilder";
+export * from "./createClientResource";
 export * from "./ResourceCard";
 export * from "./ResourceForm";
 export * from "./ResourceFormPage";

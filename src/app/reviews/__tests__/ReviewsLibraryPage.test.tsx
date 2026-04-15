@@ -2,6 +2,7 @@ import React from "react";
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ReviewsLibraryPage } from "@/reviews/components/ReviewsLibraryPage";
+import { listReviews } from "@/reviews/services/reviewService";
 import { renderWithAppProviders } from "@/testing/renderWithAppProviders";
 
 vi.mock("next/link", () => {
@@ -16,7 +17,7 @@ vi.mock("next/link", () => {
 
 describe("ReviewsLibraryPage", () => {
   it("renders review cards and actions", async () => {
-    renderWithAppProviders(<ReviewsLibraryPage />);
+    renderWithAppProviders(<ReviewsLibraryPage initialReviews={await listReviews()} />);
 
     expect(screen.getByText("Reviews pressure-test the pattern against joined lookup data.")).toBeInTheDocument();
     expect(await screen.findByText("Homepage launch checklist")).toBeInTheDocument();

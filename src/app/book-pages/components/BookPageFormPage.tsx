@@ -1,12 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
 import { FormShell, useSidePanelFormState } from "our-lib";
+import { createBookPageAction, updateBookPageAction } from "@/book-pages/actions";
 import { getBookPagesQueryKey } from "@/book-pages/components/BookPagesLibraryPage";
 import { BookPageForm } from "@/book-pages/components/BookPageForm";
-import { createBookPageService, toBookPageInput } from "@/book-pages/services/bookPageService";
+import { toBookPageInput } from "@/book-pages/models/toBookPageInput";
 import type { BookPageRecord } from "@/book-pages/models/schemas";
 import type { BookRecord } from "@/books/models/schemas";
-import { useMemo } from "react";
 
 type BookPageFormPageProps = {
   mode: "create" | "edit";
@@ -17,9 +18,15 @@ type BookPageFormPageProps = {
 };
 
 export const BookPageFormPage = ({ mode, book, pageRecord, isOpen = true, onClose }: BookPageFormPageProps) => {
-  const service = useMemo(() => createBookPageService(), []);
+  const service = useMemo(
+    () => ({
+      create: createBookPageAction,
+      update: updateBookPageAction,
+    }),
+    [],
+  );
   const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<
-    ReturnType<typeof createBookPageService>,
+    typeof service,
     BookPageRecord,
     ReturnType<typeof toBookPageInput>
   >({
@@ -29,8 +36,8 @@ export const BookPageFormPage = ({ mode, book, pageRecord, isOpen = true, onClos
     onClose,
     createService: () => service,
     queryKey: getBookPagesQueryKey(book.bookId),
-    createRecord: (serviceValue, input) => serviceValue.repository.create(input),
-    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.repository.update(currentRecordValue.pageId, input),
+    createRecord: (serviceValue, input) => serviceValue.create(input),
+    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.update(currentRecordValue.pageId, input),
     getRecordId: (currentRecordValue) => currentRecordValue.pageId,
     entityLabel: "page record",
     getCreatedMessage: (created) => `Created ${created.pageId} for ${book.title}.`,

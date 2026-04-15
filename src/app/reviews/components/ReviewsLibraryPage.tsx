@@ -1,14 +1,18 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
+import { listReviewsAction } from "@/reviews/actions";
 import { ReviewFormPage } from "@/reviews/components/ReviewFormPage";
 import type { ReviewRecord } from "@/reviews/models/schemas";
 import { reviewTypes, reviewerOptions } from "@/reviews/models/lookupData";
-import { createReviewService } from "@/reviews/services/reviewService";
 
 export const REVIEWS_QUERY_KEY = "reviews";
+
+type ReviewsLibraryPageProps = {
+  initialReviews: ReviewRecord[];
+};
 
 const getReviewTypeName = (reviewTypeId: string) => {
   return reviewTypes.find((item) => item.reviewTypeId === reviewTypeId)?.type ?? reviewTypeId;
@@ -22,13 +26,13 @@ const formatStatus = (status: string) => {
   return status[0]?.toUpperCase() + status.slice(1);
 };
 
-export const ReviewsLibraryPage = () => {
-  const service = useMemo(() => createReviewService(), []);
+export const ReviewsLibraryPage = ({ initialReviews }: ReviewsLibraryPageProps) => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<ReviewRecord | undefined>();
   const { data: reviews = [] } = useQuery({
     queryKey: [REVIEWS_QUERY_KEY],
-    queryFn: async () => (await service.repository.list()).items,
+    queryFn: listReviewsAction,
+    initialData: initialReviews,
   });
 
   const closePanel = () => {

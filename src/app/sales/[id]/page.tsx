@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SalesFormPage } from "@/sales/components/SalesFormPage";
 
 type SalesRouteProps = {
@@ -6,7 +7,11 @@ type SalesRouteProps = {
 
 const SaleDetailPage = async ({ params }: SalesRouteProps) => {
   const { id } = await params;
-  return <SalesFormPage mode="edit" saleId={id} />;
+  return (
+    <Suspense fallback={null}>
+      <SalesFormPage mode="edit" saleId={id} />
+    </Suspense>
+  );
 };
 
 export default SaleDetailPage;

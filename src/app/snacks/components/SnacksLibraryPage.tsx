@@ -1,22 +1,26 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ResourceCard, cardActionClassName } from "our-lib";
+import { listSnacksAction } from "@/snacks/actions";
 import { SnackFormPage } from "@/snacks/components/SnackFormPage";
 import { snackResource } from "@/snacks/models/resource";
 import type { SnackRecord } from "@/snacks/models/schemas";
-import { createSnackService } from "@/snacks/services/snackService";
 
 export const SNACKS_QUERY_KEY = "snacks";
 
-export const SnacksLibraryPage = () => {
-  const service = useMemo(() => createSnackService(), []);
+type SnacksLibraryPageProps = {
+  initialSnacks: SnackRecord[];
+};
+
+export const SnacksLibraryPage = ({ initialSnacks }: SnacksLibraryPageProps) => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<SnackRecord | undefined>();
   const { data: snacks = [] } = useQuery({
     queryKey: [SNACKS_QUERY_KEY],
-    queryFn: async () => (await service.repository.list()).items,
+    queryFn: listSnacksAction,
+    initialData: initialSnacks,
   });
 
   const closePanel = () => {

@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { clickButton, fillFormFields } from "our-lib";
 import { BookPageForm } from "@/book-pages/components/BookPageForm";
-import { toBookPageInput } from "@/book-pages/services/bookPageService";
+import { toBookPageInput } from "@/book-pages/models/toBookPageInput";
 
 describe("BookPageForm", () => {
   it("submits valid values after selecting an editor from the async combobox", async () => {

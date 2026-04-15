@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
+import { listBookPagesByBookIdAction } from "@/book-pages/actions";
 import { BookPageFormPage } from "@/book-pages/components/BookPageFormPage";
-import { createBookPageService } from "@/book-pages/services/bookPageService";
 import type { BookPageRecord } from "@/book-pages/models/schemas";
 import type { BookRecord } from "@/books/models/schemas";
 
@@ -14,15 +14,16 @@ export const getBookPagesQueryKey = (bookId: string) => [BOOK_PAGES_QUERY_KEY, b
 
 type BookPagesLibraryPageProps = {
   book: BookRecord;
+  initialPageRecords: BookPageRecord[];
 };
 
-export const BookPagesLibraryPage = ({ book }: BookPagesLibraryPageProps) => {
-  const service = useMemo(() => createBookPageService(), []);
+export const BookPagesLibraryPage = ({ book, initialPageRecords }: BookPagesLibraryPageProps) => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<BookPageRecord | undefined>();
   const { data: pageRecords = [] } = useQuery({
     queryKey: getBookPagesQueryKey(book.bookId),
-    queryFn: async () => (await service.repository.listByBookId(book.bookId)).items,
+    queryFn: async () => listBookPagesByBookIdAction(book.bookId),
+    initialData: initialPageRecords,
   });
 
   const closePanel = () => {

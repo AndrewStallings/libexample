@@ -2,21 +2,25 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
-import { createSampleRecordService } from "@/app/sample-records/services/sampleRecordService";
+import { listSampleRecordsAction } from "@/app/sample-records/actions";
+import type { SampleRecord } from "@/app/sample-records/models/schemas";
 
 export const SAMPLE_RECORDS_QUERY_KEY = "sample-records";
+
+type SampleRecordsLibraryPageProps = {
+  initialRecords: SampleRecord[];
+};
 
 const formatStatus = (status: string) => {
   return status.charAt(0).toUpperCase() + status.slice(1);
 };
 
-export const SampleRecordsLibraryPage = () => {
-  const service = useMemo(() => createSampleRecordService(), []);
+export const SampleRecordsLibraryPage = ({ initialRecords }: SampleRecordsLibraryPageProps) => {
   const { data: records = [] } = useQuery({
     queryKey: [SAMPLE_RECORDS_QUERY_KEY],
-    queryFn: async () => (await service.repository.list()).items,
+    queryFn: listSampleRecordsAction,
+    initialData: initialRecords,
   });
 
   return (

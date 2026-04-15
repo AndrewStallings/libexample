@@ -2,25 +2,29 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { CardActionButton, EntityCard, cardActionClassName } from "our-lib";
+import { listBooksAction } from "@/books/actions";
 import { BookFormPage } from "@/books/components/BookFormPage";
 import type { BookRecord } from "@/books/models/schemas";
-import { createBookService } from "@/books/services/bookService";
 
 export const BOOKS_QUERY_KEY = "books";
+
+type BooksLibraryPageProps = {
+  initialBooks: BookRecord[];
+};
 
 const formatStatus = (status: string) => {
   return status[0]?.toUpperCase() + status.slice(1);
 };
 
-export const BooksLibraryPage = () => {
-  const service = useMemo(() => createBookService(), []);
+export const BooksLibraryPage = ({ initialBooks }: BooksLibraryPageProps) => {
   const [panelMode, setPanelMode] = useState<"create" | "edit" | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<BookRecord | undefined>();
   const { data: books = [] } = useQuery({
     queryKey: [BOOKS_QUERY_KEY],
-    queryFn: async () => (await service.repository.list()).items,
+    queryFn: listBooksAction,
+    initialData: initialBooks,
   });
 
   const closePanel = () => {

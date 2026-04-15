@@ -1,11 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import { FormShell, ResourceForm, useSidePanelFormState } from "our-lib";
+import { createSnackAction, updateSnackAction } from "@/snacks/actions";
 import { SNACKS_QUERY_KEY } from "@/snacks/components/SnacksLibraryPage";
 import { snackResource } from "@/snacks/models/resource";
 import type { SnackInput, SnackRecord } from "@/snacks/models/schemas";
-import { createSnackService } from "@/snacks/services/snackService";
-import { useMemo } from "react";
 
 type SnackFormPageProps = {
   mode: "create" | "edit";
@@ -15,9 +15,15 @@ type SnackFormPageProps = {
 };
 
 export const SnackFormPage = ({ mode, record, isOpen = true, onClose }: SnackFormPageProps) => {
-  const service = useMemo(() => createSnackService(), []);
+  const service = useMemo(
+    () => ({
+      create: createSnackAction,
+      update: updateSnackAction,
+    }),
+    [],
+  );
   const { currentRecord, statusMessage, handleSubmit } = useSidePanelFormState<
-    ReturnType<typeof createSnackService>,
+    typeof service,
     SnackRecord,
     SnackInput
   >({
@@ -27,8 +33,8 @@ export const SnackFormPage = ({ mode, record, isOpen = true, onClose }: SnackFor
     onClose,
     createService: () => service,
     queryKey: [SNACKS_QUERY_KEY],
-    createRecord: (serviceValue, input) => serviceValue.repository.create(input),
-    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.repository.update(currentRecordValue.snackId, input),
+    createRecord: (serviceValue, input) => serviceValue.create(input),
+    updateRecord: (serviceValue, currentRecordValue, input) => serviceValue.update(currentRecordValue.snackId, input),
     getRecordId: (currentRecordValue) => currentRecordValue.snackId,
     entityLabel: "snack",
   });

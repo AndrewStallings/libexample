@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { ResourceFormPage } from "our-lib";
+import { createSampleRecordAction, updateSampleRecordAction } from "@/app/sample-records/actions";
 import { sampleRecordProfile } from "@/app/sample-records/models/profile";
 import type { SampleRecord } from "@/app/sample-records/models/schemas";
-import { createSampleRecordService } from "@/app/sample-records/services/sampleRecordService";
 
 type SampleRecordFormPageProps = {
   mode: "create" | "edit";
@@ -12,6 +13,14 @@ type SampleRecordFormPageProps = {
 };
 
 export const SampleRecordFormPage = ({ mode, record }: SampleRecordFormPageProps) => {
+  const service = useMemo(
+    () => ({
+      create: createSampleRecordAction,
+      update: updateSampleRecordAction,
+    }),
+    [],
+  );
+
   return (
     <ResourceFormPage
       mode={mode}
@@ -34,9 +43,9 @@ export const SampleRecordFormPage = ({ mode, record }: SampleRecordFormPageProps
           {children}
         </Link>
       )}
-      createService={() => createSampleRecordService()}
-      createRecord={(serviceValue, input) => serviceValue.repository.create(input)}
-      updateRecord={(serviceValue, currentRecordValue, input) => serviceValue.repository.update(currentRecordValue.sampleRecordId, input)}
+      createService={() => service}
+      createRecord={(serviceValue, input) => serviceValue.create(input)}
+      updateRecord={(serviceValue, currentRecordValue, input) => serviceValue.update(currentRecordValue.sampleRecordId, input)}
       getRecordId={(currentRecordValue) => currentRecordValue.sampleRecordId}
       entityLabel="record"
     />

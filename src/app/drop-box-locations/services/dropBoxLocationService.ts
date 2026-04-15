@@ -1,3 +1,5 @@
+import "server-only";
+
 import {
   createWorkflowService,
   InMemoryAuditLogger,
@@ -17,7 +19,7 @@ const createRepositoryForEnvironment = (): RecordRepository<
   DropBoxLocationInput,
   DropBoxLocationInput
 > => {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.APP_DROP_BOX_LOCATION_REPOSITORY_MODE === "production") {
     return new ProductionDropBoxLocationRepository();
   }
 
@@ -45,8 +47,6 @@ const createDropBoxLocationDependencies = (): DropBoxLocationDependencies => {
     logger: createLoggerForEnvironment(),
   };
 };
-
-const dependencies = createDropBoxLocationDependencies();
 
 const hasMarketingBigNumber = (locationId: string) => {
   const digitsOnly = locationId.replace(/[^\d]/g, "");
@@ -88,37 +88,74 @@ const createDropBoxLocationResourceHelpers = ({ repository, logger }: DropBoxLoc
   };
 };
 
+type DropBoxLocationResourceService = ReturnType<typeof createDropBoxLocationResourceHelpers>;
+
 export type DropBoxLocationService = {
   repository: DropBoxLocationRepository;
   logger: AuditLogger;
-  validation: Pick<ReturnType<typeof createDropBoxLocationResourceHelpers>, "validate">;
+  list: () => Promise<DropBoxLocationRecord[]>;
+  getById: (locationId: string) => Promise<DropBoxLocationRecord | null>;
+  create: (input: DropBoxLocationInput) => Promise<DropBoxLocationRecord>;
+  update: (locationId: string, input: DropBoxLocationInput) => Promise<DropBoxLocationRecord>;
+  validation: Pick<DropBoxLocationResourceService, "validate">;
   logging: ReturnType<typeof createDropBoxLocationLoggingHelpers>;
-  resource: ReturnType<typeof createDropBoxLocationResourceHelpers>;
+  resource: DropBoxLocationResourceService;
   getMarketingBigNumberLocationIds: () => Promise<string[]>;
 };
 
-export const createDropBoxLocationService = () => {
+export const createDropBoxLocationService = (dependencies: DropBoxLocationDependencies = createDropBoxLocationDependencies()) => {
   const { repository, logger } = dependencies;
   const logging = createDropBoxLocationLoggingHelpers(logger);
   const resource = createDropBoxLocationResourceHelpers({ repository, logger });
+  const list = async () => {
+    return (await repository.list()).items;
+  };
+  const getById = async (locationId: string) => {
+    return repository.getById(locationId);
+  };
+  const create = async (input: DropBoxLocationInput) => {
+    return resource.create(input, input.districtManager);
+  };
+  const update = async (locationId: string, input: DropBoxLocationInput) => {
+    return resource.update(locationId, input, input.districtManager);
+  };
 
   return {
     repository,
     logger,
+    list,
+    getById,
+    create,
+    update,
     validation: {
       validate: resource.validate,
     },
     logging,
     resource,
     getMarketingBigNumberLocationIds: async () => {
-      const result = await repository.list();
-      return result.items
-        .map((record) => record.locationId)
-        .filter((locationId) => hasMarketingBigNumber(locationId));
+      return (await list()).map((record) => record.locationId).filter((locationId) => hasMarketingBigNumber(locationId));
     },
   } satisfies DropBoxLocationService;
 };
 
-export const createDropBoxLocationResourceService = () => {
-  return createDropBoxLocationService().resource;
+const dropBoxLocationService = createDropBoxLocationService();
+
+export const createDropBoxLocationResourceService = (dependencies?: DropBoxLocationDependencies) => {
+  return createDropBoxLocationService(dependencies).resource;
+};
+
+export const listDropBoxLocations = async () => {
+  return dropBoxLocationService.list();
+};
+
+export const getDropBoxLocationById = async (locationId: string) => {
+  return dropBoxLocationService.getById(locationId);
+};
+
+export const createDropBoxLocation = async (input: DropBoxLocationInput) => {
+  return dropBoxLocationService.create(input);
+};
+
+export const updateDropBoxLocation = async (locationId: string, input: DropBoxLocationInput) => {
+  return dropBoxLocationService.update(locationId, input);
 };

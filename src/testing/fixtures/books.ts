@@ -1,6 +1,6 @@
 import { initialBooks } from "@/books/data/bookRepository";
 import type { BookInput, BookRecord } from "@/books/models/schemas";
-import { toBookInput } from "@/books/services/bookService";
+import { toBookInput } from "@/books/models/toBookInput";
 
 export const createBookInput = (overrides: Partial<BookInput> = {}): BookInput => {
   return {

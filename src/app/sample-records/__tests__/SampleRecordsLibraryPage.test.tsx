@@ -2,7 +2,7 @@ import React from "react";
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SampleRecordsLibraryPage } from "@/app/sample-records/components/SampleRecordsLibraryPage";
-import { resetSampleRecordService } from "@/app/sample-records/services/sampleRecordService";
+import { listSampleRecords, resetSampleRecordService } from "@/app/sample-records/services/sampleRecordService";
 import { renderWithAppProviders } from "@/testing/renderWithAppProviders";
 
 vi.mock("next/link", () => {
@@ -21,7 +21,7 @@ describe("SampleRecordsLibraryPage", () => {
   });
 
   it("renders entity cards from the sample table", async () => {
-    renderWithAppProviders(<SampleRecordsLibraryPage />);
+    renderWithAppProviders(<SampleRecordsLibraryPage initialRecords={await listSampleRecords()} />);
 
     expect(screen.getByText("One table, one service, and a direct card layout.")).toBeInTheDocument();
     expect(await screen.findByText("Primary Campaign")).toBeInTheDocument();
