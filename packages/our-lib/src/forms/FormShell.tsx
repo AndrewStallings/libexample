@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useId } from "react";
-import { libAccentBadgeStyle, libPanelStyle, libStatusMessageStyle } from "../styles";
 
 type LinkRenderProps = {
   href: string;
@@ -23,6 +22,10 @@ export type FormShellProps = {
   children: ReactNode;
 };
 
+const badgeClassName = "text-[11px] font-semibold uppercase tracking-[0.18em] text-[#00249c] dark:text-[#89a8ff]";
+const statusMessageClassName =
+  "mt-5 rounded-2xl border border-[#bfd0ff] bg-[#edf3ff] px-4 py-3 text-sm text-[#001c77] dark:border-[#2e468f] dark:bg-[#10172d] dark:text-white";
+
 const renderBackAction = (backHref?: string, backLabel?: string, renderBackLink?: (props: LinkRenderProps) => ReactNode) => {
   if (!backHref || !backLabel) {
     return null;
@@ -31,10 +34,10 @@ const renderBackAction = (backHref?: string, backLabel?: string, renderBackLink?
   return (
     renderBackLink?.({
       href: backHref,
-      className: "text-sm font-medium text-slate-500 transition hover:text-[color:var(--lib-primary-strong)] dark:text-slate-400 dark:hover:text-white",
+      className: "text-sm font-medium text-slate-600 transition hover:text-[#001c77] dark:text-zinc-300 dark:hover:text-white",
       children: backLabel,
     }) ?? (
-      <a className="text-sm font-medium text-slate-500 transition hover:text-[color:var(--lib-primary-strong)] dark:text-slate-400 dark:hover:text-white" href={backHref}>
+      <a className="text-sm font-medium text-slate-600 transition hover:text-[#001c77] dark:text-zinc-300 dark:hover:text-white" href={backHref}>
         {backLabel}
       </a>
     )
@@ -83,47 +86,35 @@ export const FormShell = ({
         <aside
           aria-labelledby={titleId}
           aria-modal="true"
-          className="relative z-10 flex h-full w-full max-w-3xl flex-col overflow-hidden border-l shadow-[0_32px_80px_rgba(15,23,42,0.14)] dark:text-white"
+          className="relative z-10 flex h-full w-full max-w-3xl flex-col overflow-hidden border-l border-slate-200 bg-white text-black shadow-[0_32px_80px_rgba(15,23,42,0.14)] dark:border-zinc-700 dark:bg-black dark:text-white"
           role="dialog"
-          style={{ ...libPanelStyle, backgroundColor: "var(--lib-surface)" }}
         >
-          <div
-            className="border-b px-5 py-6 md:px-7"
-            style={{
-              background: "var(--lib-panel-hero)",
-              borderColor: "var(--lib-border)",
-            }}
-          >
+          <div className="border-b border-slate-200 bg-[linear-gradient(135deg,#eef3ff_0%,#ffffff_52%,#dbe6ff_100%)] px-5 py-6 dark:border-zinc-700 dark:bg-[linear-gradient(135deg,#000000_0%,#111827_45%,#18181b_100%)] md:px-7">
             <div className="flex items-start justify-between gap-4">
               <div className="relative pl-5">
-                <div className="absolute left-0 top-1 h-16 w-1 rounded-full" style={{ backgroundColor: "var(--lib-panel-accent)" }} />
-                <p className="text-[11px] font-semibold uppercase" style={libAccentBadgeStyle}>
+                <div className="absolute left-0 top-1 h-16 w-1 rounded-full bg-[#00249c] dark:bg-[#7ea2ff]" />
+                <p className={badgeClassName}>
                   Editing Workspace
                 </p>
-                <h2 className="mt-2 text-3xl font-semibold leading-tight" id={titleId} style={{ color: "var(--lib-panel-hero-ink)" }}>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-black dark:text-white" id={titleId}>
                   {title}
                 </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6" style={{ color: "var(--lib-panel-hero-copy)" }}>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-zinc-300">
                   {description}
                 </p>
               </div>
               <button
-                className="rounded-xl border px-4 py-2 text-sm font-medium transition hover:opacity-90"
+                className="rounded-xl border border-slate-300 bg-white/80 px-4 py-2 text-sm font-medium text-black transition hover:bg-white dark:border-zinc-600 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800"
                 onClick={onClose}
-                style={{
-                  backgroundColor: "var(--lib-panel-button-bg)",
-                  borderColor: "var(--lib-panel-button-border)",
-                  color: "var(--lib-panel-button-ink)",
-                }}
                 type="button"
               >
                 Close
               </button>
             </div>
-            {statusMessage ? <div className="mt-5 rounded-2xl border px-4 py-3 text-sm" style={libStatusMessageStyle}>{statusMessage}</div> : null}
+            {statusMessage ? <div className={statusMessageClassName}>{statusMessage}</div> : null}
           </div>
 
-          <div className="flex-1 overflow-y-auto px-5 py-6 md:px-7 md:py-7" style={{ background: "var(--lib-panel-body)" }}>
+          <div className="flex-1 overflow-y-auto bg-slate-50 px-5 py-6 dark:bg-zinc-950 md:px-7 md:py-7">
             {children}
           </div>
         </aside>
@@ -132,22 +123,15 @@ export const FormShell = ({
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-10 dark:text-white md:px-8">
+    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-10 text-black dark:text-white md:px-8">
       <section className="max-w-3xl">
         {renderBackAction(backHref, backLabel, renderBackLink)}
-        <div className="mt-5 h-px w-20 bg-[color:var(--lib-primary)]/80" />
-        <h1 className="mt-5 text-4xl font-semibold leading-tight text-slate-900 dark:text-white">{title}</h1>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-300">
+        <div className="mt-5 h-px w-20 bg-[#00249c]/80" />
+        <h1 className="mt-5 text-4xl font-semibold leading-tight text-black dark:text-white">{title}</h1>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-zinc-300">
           {description}
         </p>
-        {statusMessage ? (
-          <div
-            className="mt-5 rounded-2xl border px-4 py-3 text-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-100"
-            style={libStatusMessageStyle}
-          >
-            {statusMessage}
-          </div>
-        ) : null}
+        {statusMessage ? <div className={statusMessageClassName}>{statusMessage}</div> : null}
       </section>
 
       {children}

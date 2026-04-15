@@ -62,7 +62,7 @@ export const ResourceForm = <TRecord, TInput extends Record<string, unknown>>({
     title: profile.getFormTitle(mode, record),
     footer: (
       <button
-        className="rounded-xl bg-[color:var(--lib-primary)] px-5 py-2.5 font-medium text-white shadow-[0_12px_30px_rgba(0,36,156,0.18)] transition hover:bg-[color:var(--lib-primary-strong)] dark:ring-1 dark:ring-white/10"
+        className="rounded-xl border border-[#00249c] bg-[#00249c] px-5 py-2.5 font-medium text-white shadow-[0_12px_30px_rgba(0,36,156,0.18)] transition hover:bg-[#001c77] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#00249c]/20 dark:border-[#3f63d6] dark:bg-[#00249c] dark:text-white dark:hover:bg-[#16379f]"
         type="submit"
       >
         {profile.getSubmitLabel(mode)}
@@ -103,7 +103,7 @@ export const ResourceForm = <TRecord, TInput extends Record<string, unknown>>({
           </div>
         ))}
         {localSubmitError ? (
-          <div className="md:col-span-2 text-sm" style={{ color: "var(--danger)" }}>
+          <div className="text-sm text-red-700 dark:text-red-300 md:col-span-2">
             {localSubmitError}
           </div>
         ) : null}
