@@ -4,6 +4,7 @@ import { createWorkflowService, InMemoryAuditLogger, type AuditLogEntry } from "
 import { createSampleRecordRepository } from "@/app/sample-records/data/sampleRecordRepository";
 import { sampleRecordInputSchema } from "@/app/sample-records/models/schemas";
 import type { SampleRecord, SampleRecordInput } from "@/app/sample-records/models/schemas";
+import { toSampleRecordInput } from "@/app/sample-records/models/toSampleRecordInput";
 import { createAppAuditLogger } from "@/config/auditLogger";
 
 const isAttentionReadyRecord = (record: SampleRecord) => {
@@ -53,15 +54,7 @@ export const createSampleRecordService = (dependencies: SampleRecordServiceDepen
     getAttentionReadyRecordIds: async () => {
       return (await repository.list()).items.filter(isAttentionReadyRecord).map((record) => record.sampleRecordId);
     },
-    toInput: (record?: SampleRecord): SampleRecordInput => {
-      return {
-        title: record?.title ?? "",
-        groupName: record?.groupName ?? "",
-        ownerName: record?.ownerName ?? "",
-        status: record?.status ?? "active",
-        notes: record?.notes ?? "",
-      };
-    },
+    toInput: toSampleRecordInput,
   };
 };
 

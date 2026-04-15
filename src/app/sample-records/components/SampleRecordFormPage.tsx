@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 import { ResourceFormPage } from "our-lib";
-import { createSampleRecordAction, updateSampleRecordAction } from "@/app/sample-records/actions";
-import { sampleRecordProfile } from "@/app/sample-records/models/profile";
+import { sampleRecordClient } from "@/app/sample-records/client/sampleRecordClient";
 import type { SampleRecord } from "@/app/sample-records/models/schemas";
 
 type SampleRecordFormPageProps = {
@@ -12,30 +10,27 @@ type SampleRecordFormPageProps = {
   record?: SampleRecord | undefined;
 };
 
-export const SampleRecordFormPage = ({ mode, record }: SampleRecordFormPageProps) => {
-  const service = useMemo(
-    () => ({
-      create: createSampleRecordAction,
-      update: updateSampleRecordAction,
-    }),
-    [],
-  );
+const getSampleRecordClient = () => sampleRecordClient;
+const createSampleRecord = (client: typeof sampleRecordClient, input: Parameters<typeof sampleRecordClient.create>[0]) => {
+  return client.create(input);
+};
+const updateSampleRecord = (
+  client: typeof sampleRecordClient,
+  currentRecord: SampleRecord,
+  input: Parameters<typeof sampleRecordClient.create>[0],
+) => {
+  return client.update(currentRecord, input);
+};
+const getSampleRecordId = (record: SampleRecord) => record.sampleRecordId;
 
+export const SampleRecordFormPage = ({ mode, record }: SampleRecordFormPageProps) => {
   return (
     <ResourceFormPage
       mode={mode}
       record={record}
       description="This sample uses a dedicated page layout so the service, workflow, and form profile can be seen in a simpler end-to-end route."
-      profile={sampleRecordProfile}
-      toInput={(currentRecord) => {
-        return {
-          title: currentRecord?.title ?? "",
-          groupName: currentRecord?.groupName ?? "",
-          ownerName: currentRecord?.ownerName ?? "",
-          status: currentRecord?.status ?? "active",
-          notes: currentRecord?.notes ?? "",
-        };
-      }}
+      profile={sampleRecordClient.profile}
+      toInput={sampleRecordClient.toInput}
       backHref="/sample-records"
       backLabel="Back to sample records"
       renderBackLink={({ href, className, children }) => (
@@ -43,11 +38,11 @@ export const SampleRecordFormPage = ({ mode, record }: SampleRecordFormPageProps
           {children}
         </Link>
       )}
-      createService={() => service}
-      createRecord={(serviceValue, input) => serviceValue.create(input)}
-      updateRecord={(serviceValue, currentRecordValue, input) => serviceValue.update(currentRecordValue.sampleRecordId, input)}
-      getRecordId={(currentRecordValue) => currentRecordValue.sampleRecordId}
-      entityLabel="record"
+      createService={getSampleRecordClient}
+      createRecord={createSampleRecord}
+      updateRecord={updateSampleRecord}
+      getRecordId={getSampleRecordId}
+      entityLabel={sampleRecordClient.entityLabel}
     />
   );
 };
